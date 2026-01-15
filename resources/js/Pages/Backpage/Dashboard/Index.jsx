@@ -22,7 +22,7 @@ export default function DashboardPage() {
                             <span className="font-semibold">
                                 {auth.user.role === "ADMIN"
                                     ? "ADMIN"
-                                    : "CUSTOMER"}
+                                    : "CASHIER"}
                             </span>
                             .
                         </h5>
