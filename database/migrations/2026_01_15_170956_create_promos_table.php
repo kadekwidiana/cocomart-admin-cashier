@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->string('code');
-            $table->integer('discount');
+            $table->integer('discount_percentage');
             $table->boolean('is_active');
             $table->text('image');
             $table->date('start_date');

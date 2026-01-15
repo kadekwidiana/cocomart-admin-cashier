@@ -15,7 +15,7 @@ class Promo extends Model
     protected $fillable = [
         'title',
         'code',
-        'discount',
+        'discount_percentage',
         'is_active',
         'image',
         'start_date',

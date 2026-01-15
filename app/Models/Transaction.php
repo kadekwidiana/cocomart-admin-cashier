@@ -26,7 +26,7 @@ class Transaction extends Model
 
     protected $casts = [
         'subtotal' => 'decimal:2',
-        'discount' => 'integer',
+        'discount' => 'decimal:2',
         'shipping_cost' => 'decimal:2',
         'total' => 'decimal:2',
     ];

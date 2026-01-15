@@ -19,7 +19,7 @@ return new class extends Migration
             $table->enum('fulfillment_type', ['PICKUP', 'SHIPMENT'])->default('PICKUP');
             $table->text('payment_token')->nullable();
             $table->decimal('subtotal', 12, 2);
-            $table->integer('discount')->default(0);
+            $table->decimal('discount', 12, 2)->default(0);
             $table->decimal('shipping_cost', 12, 2)->default(0);
             $table->decimal('total', 12, 2);
             $table->timestamps();
