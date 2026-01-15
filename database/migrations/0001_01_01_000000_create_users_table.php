@@ -18,8 +18,8 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('role', ['CASHIER', 'ADMIN'])->default('CASHIER');
-            $table->string('phone_number');
-            $table->string('address');
+            $table->string('phone_number')->nullable();
+            $table->string('address')->nullable();
             $table->boolean('is_active')->default(true);
             $table->string('oxy_store_id')->nullable();
             $table->rememberToken();

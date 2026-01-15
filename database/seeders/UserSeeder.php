@@ -26,10 +26,10 @@ class UserSeeder extends Seeder
             ],
             [
                 'id' => 2,
-                'name' => 'Customer User',
-                'email' => 'customer@example.com',
+                'name' => 'Cashier User',
+                'email' => 'cashier@example.com',
                 'password' => Hash::make('password123'),
-                'role' => 'CUSTOMER',
+                'role' => 'CASHIER',
                 'created_at' => now(),
                 'updated_at' => now(),
             ]
