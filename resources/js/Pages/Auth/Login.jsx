@@ -23,7 +23,7 @@ export default function Login() {
                                 <img
                                     src="/assets/images/logo.png"
                                     alt="Logo"
-                                    className="size-28 rounded-full"
+                                    className="w-32"
                                 />
                             </Link>
                             <h2 className="text-center text-2xl/9 font-bold tracking-tight text-gray-900">
@@ -79,7 +79,7 @@ export default function Login() {
                                     setData("remember", e.target.checked)
                                 }
                             />
-                            <Label htmlFor="remember">Remember me</Label>
+                            <Label htmlFor="remember">Ingat Saya</Label>
                         </div>
                         <Button
                             type="submit"
@@ -89,23 +89,7 @@ export default function Login() {
                         >
                             Login
                         </Button>
-                        <div className="mt-2 text-center">
-                            <p>
-                                Belum Punya Akun?{" "}
-                                <Link
-                                    href="/register"
-                                    className="text-blue-600 underline"
-                                >
-                                    Register
-                                </Link>
-                            </p>
-                        </div>
                     </form>
-                    <div className="mt-2 flex w-full justify-center">
-                        <a href="#" target="_blank">
-                            <p className="text-blue-600">©2025 Nos.Project</p>
-                        </a>
-                    </div>
                 </div>
             </div>
         </>

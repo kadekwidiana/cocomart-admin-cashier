@@ -11,14 +11,16 @@ Route::fallback(function () {
         ->setStatusCode(404);
 });
 
-// frontpage
+// redirect to login page
 Route::get('/', function () {
-    return Inertia::render('Frontpage/Index');
-})->name('frontpage.home');
+    return redirect()->route('login');
+})->name('home');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
-        return Inertia::render('Backpage/Dashboard/Index');
+        return Inertia::render('Backpage/Dashboard/Index', [
+            'title' => 'Dashboard',
+        ]);
     })->name('dashboard');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

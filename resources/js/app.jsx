@@ -19,6 +19,6 @@ createInertiaApp({
         root.render(<App {...props} />);
     },
     progress: {
-        color: "rgb(8 145 178 / var(--tw-text-opacity, 1))",
+        color: "rgb(242 183 5 / var(--tw-text-opacity, 1))", // setara #F2B705
     },
 });
