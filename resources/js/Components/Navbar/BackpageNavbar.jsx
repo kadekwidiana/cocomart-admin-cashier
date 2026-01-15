@@ -18,7 +18,7 @@ export default function BackpageNavbar({ handleBackpageSidebarToggle }) {
                         <img
                             src="/assets/images/logo.png"
                             alt="Logo"
-                            className="size-9 rounded-full"
+                            className="w-10"
                         />
                     </Link>
                     <h1 className="text-xl font-semibold text-gray-700">
