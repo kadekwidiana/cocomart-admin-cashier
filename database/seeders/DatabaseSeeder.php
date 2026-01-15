@@ -23,7 +23,9 @@ class DatabaseSeeder extends Seeder
             TransactionSeeder::class,
             TransactionItemSeeder::class,
             TransactionPickupSeeder::class,
-            TransactionShipmentSeeder::class
+            TransactionShipmentSeeder::class,
+            NotificationSeeder::class,
+            OxyApiTokenSeeder::class
         ]);
     }
 }
