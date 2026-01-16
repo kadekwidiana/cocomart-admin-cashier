@@ -13,6 +13,32 @@ class PaginationResource extends JsonResource
      *
      * @return array<string, mixed>
      */
+
+    // versi old
+    // public function toArray(Request $request): array
+    // {
+    //     if (!$this->resource instanceof LengthAwarePaginator) {
+    //         return [];
+    //     }
+
+    //     return [
+    //         'total' => $this->resource->total(),
+    //         'current_page' => $this->resource->currentPage(),
+    //         'last_page' => $this->resource->lastPage(),
+    //         'per_page' => $this->resource->perPage(),
+    //         'from' => $this->resource->firstItem(),
+    //         'to' => $this->resource->lastItem(),
+    //         'sort' => $this->additional['sort'] ?? 'asc',
+    //         'sort_by' => $this->additional['sort_by'] ?? 'created_at',
+    //         // 'next_page_url' => $this->resource->nextPageUrl(),
+    //         // 'prev_page_url' => $this->resource->previousPageUrl(),
+    //         // 'first_page_url' => $this->resource->url(1),
+    //         // 'last_page_url' => $this->resource->url($this->resource->lastPage()),
+    //         // 'links' => $this->generatePaginationLinks(),
+    //     ];
+    // }
+
+    // versi mengikuti oxy
     public function toArray(Request $request): array
     {
         if (!$this->resource instanceof LengthAwarePaginator) {
@@ -21,18 +47,9 @@ class PaginationResource extends JsonResource
 
         return [
             'total' => $this->resource->total(),
-            'current_page' => $this->resource->currentPage(),
-            'last_page' => $this->resource->lastPage(),
-            'per_page' => $this->resource->perPage(),
-            'from' => $this->resource->firstItem(),
-            'to' => $this->resource->lastItem(),
-            'sort' => $this->additional['sort'] ?? 'asc',
-            'sort_by' => $this->additional['sort_by'] ?? 'created_at',
-            // 'next_page_url' => $this->resource->nextPageUrl(),
-            // 'prev_page_url' => $this->resource->previousPageUrl(),
-            // 'first_page_url' => $this->resource->url(1),
-            // 'last_page_url' => $this->resource->url($this->resource->lastPage()),
-            // 'links' => $this->generatePaginationLinks(),
+            'currentPage' => $this->resource->currentPage(),
+            'totalPages' => $this->resource->lastPage(),
+            'start' => $this->resource->firstItem()
         ];
     }
 
