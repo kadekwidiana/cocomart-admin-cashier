@@ -67,5 +67,13 @@ Route::prefix('v1')->group(function () {
             Route::get('count', [NotificationController::class, 'count']);
             Route::post('read', [NotificationController::class, 'read']);
         });
+
+        // item master
+        Route::prefix('itemmaster')->group(function () {
+            Route::get('/check-is-wishlist/{oxyItemMasterId}/customer/{oxyCustomerId}', [ItemMasterController::class, 'checkIsWishlist']);
+            Route::post('/add-to-wishlist', [ItemMasterController::class, 'addToWishList']);
+            Route::delete('/remove-from-wishlist/{oxyItemMasterId}/customer/{oxyCustomerId}', [ItemMasterController::class, 'removeFromWishList']);
+            Route::get('/wishlist-by-customer/{oxyCustomerId}', [ItemMasterController::class, 'getItemMasterWishlistByCustomer']);
+        });
     });
 });
