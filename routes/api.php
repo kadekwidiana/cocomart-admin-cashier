@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\ApiResponse;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\ImageSliderController;
 use App\Http\Controllers\API\ItemMasterController;
@@ -18,6 +19,7 @@ Route::get('/user', function (Request $request) {
 
 // API V1
 Route::prefix('v1')->group(function () {
+    // PUBLIC
     Route::prefix('itemmaster')->group(function () {
         Route::get('/images/{oxyItemMasterId}', [ItemMasterController::class, 'images']);
         Route::get('/', [ItemMasterController::class, 'getItemMasters']);
@@ -47,5 +49,15 @@ Route::prefix('v1')->group(function () {
     // image slider
     Route::prefix('image-slider')->group(function () {
         Route::get('', [ImageSliderController::class, 'index']);
+    });
+
+    // PROTECTED
+    Route::middleware('oxy.auth')->prefix('protected')->group(function () {
+        Route::get('/test', function () {
+            return ApiResponse::success(
+                data: null,
+                message: 'Welcome to the Protected API'
+            );
+        });
     });
 });

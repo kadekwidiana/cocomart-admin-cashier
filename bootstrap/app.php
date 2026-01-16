@@ -20,7 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
 
         $middleware->alias([
-            'checkRole' => CheckRole::class
+            'checkRole' => CheckRole::class,
+            'oxy.auth' => \App\Http\Middleware\OxyAuthMiddleware::class,
         ]);
 
         $middleware->validateCsrfTokens(except: [
