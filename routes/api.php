@@ -19,22 +19,22 @@ Route::get('/user', function (Request $request) {
 // API V1
 Route::prefix('v1')->group(function () {
     Route::prefix('itemmaster')->group(function () {
-        Route::get('/images/{oxy_item_master_id}', [ItemMasterController::class, 'images']);
+        Route::get('/images/{oxyItemMasterId}', [ItemMasterController::class, 'images']);
         Route::get('/', [ItemMasterController::class, 'getItemMasters']);
         Route::get('/detail', [ItemMasterController::class, 'getItemMasterDetail']);
-        Route::get('/prices/{oxy_item_master_id}', [ItemMasterController::class, 'getItemMasterPrice']);
+        Route::get('/prices/{oxyItemMasterId}', [ItemMasterController::class, 'getItemMasterPrice']);
         Route::get('/stock', [ItemMasterController::class, 'getItemMasterStock']);
-        Route::get('/stocklocation/{oxy_item_master_id}', [ItemMasterController::class, 'getItemMasterStockLocation']);
+        Route::get('/stocklocation/{oxyItemMasterId}', [ItemMasterController::class, 'getItemMasterStockLocation']);
     });
 
     Route::prefix('category')->group(function () {
-        Route::get('/images/{oxy_category_id}', [CategoryController::class, 'images']);
+        Route::get('/images/{oxyCategoryId}', [CategoryController::class, 'images']);
         Route::get('/', [CategoryController::class, 'getCategories']);
         Route::get('/sub', [CategoryController::class, 'getSubCategories']);
     });
 
     Route::prefix('store')->group(function () {
-        Route::get('/images/{oxy_store_id}', [StoreController::class, 'images']);
+        Route::get('/images/{oxyStoreId}', [StoreController::class, 'images']);
         Route::get('/locations', [StoreController::class, 'getLocations']);
     });
 

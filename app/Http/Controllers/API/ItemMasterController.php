@@ -12,10 +12,10 @@ use Illuminate\Http\Request;
 
 class ItemMasterController extends Controller
 {
-    public function images(string $oxy_item_master_id)
+    public function images(string $oxyItemMasterId)
     {
         try {
-            $images = ItemMasterImage::where('oxy_item_master_id', $oxy_item_master_id)->get();
+            $images = ItemMasterImage::where('oxy_item_master_id', $oxyItemMasterId)->get();
 
             return ApiResponse::success(ItemMasterImageResource::collection($images), 'Images retrieved successfully');
         } catch (\Exception $e) {
@@ -77,14 +77,14 @@ class ItemMasterController extends Controller
         }
     }
 
-    public function getItemMasterPrice(string $oxy_item_master_id)
+    public function getItemMasterPrice(string $oxyItemMasterId)
     {
         try {
             $oxyAccessToken = OxyApiToken::getAccessToken();
 
             $response = ItemMasterOxyService::getItemMasterPrice(
                 token: $oxyAccessToken,
-                id: $oxy_item_master_id ?? null,
+                id: $oxyItemMasterId ?? null,
             );
 
             if (!$response['success']) {
@@ -125,14 +125,14 @@ class ItemMasterController extends Controller
         }
     }
 
-    public function getItemMasterStockLocation(string $oxy_item_master_id)
+    public function getItemMasterStockLocation(string $oxyItemMasterId)
     {
         try {
             $oxyAccessToken = OxyApiToken::getAccessToken();
 
             $response = ItemMasterOxyService::getItemMasterStockLocation(
                 token: $oxyAccessToken,
-                id: $oxy_item_master_id ?? null,
+                id: $oxyItemMasterId ?? null,
             );
 
             if (!$response['success']) {

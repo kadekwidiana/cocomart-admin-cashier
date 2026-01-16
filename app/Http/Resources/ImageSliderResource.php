@@ -19,9 +19,9 @@ class ImageSliderResource extends JsonResource
             'image' => $this->image ? url($this->image) : null,
             'link' => $this->link,
             'index' => $this->index,
-            'is_active' => $this->is_active,
-            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
-            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
+            'isActive' => (bool) $this->is_active,
+            'createdAt' => $this->created_at?->format('Y-m-d H:i:s'),
+            'updatedAt' => $this->updated_at?->format('Y-m-d H:i:s'),
         ];
     }
 }

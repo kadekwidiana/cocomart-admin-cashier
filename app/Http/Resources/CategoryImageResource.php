@@ -16,10 +16,12 @@ class CategoryImageResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'oxy_category_id' => $this->oxy_category_id,
-            'image' => $this->image ? url($this->image) : url('/assets/images/category-default.png'),
-            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
-            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
+            'oxyCategoryId' => $this->oxy_category_id,
+            'image' => $this->image
+                ? url($this->image)
+                : url('/assets/images/category-default.png'),
+            'createdAt' => $this->created_at?->format('Y-m-d H:i:s'),
+            'updatedAt' => $this->updated_at?->format('Y-m-d H:i:s'),
         ];
     }
 }

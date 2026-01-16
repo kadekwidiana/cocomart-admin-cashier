@@ -12,10 +12,10 @@ use App\Services\External\Oxy\StoreOxyService;
 
 class StoreController extends Controller
 {
-    public function images(string $oxy_store_id)
+    public function images(string $oxyStoreId)
     {
         try {
-            $images = StoreImage::where('oxy_store_id', $oxy_store_id)->get();
+            $images = StoreImage::where('oxy_store_id', $oxyStoreId)->get();
 
             return ApiResponse::success(StoreImageResource::collection($images), 'Images retrieved successfully');
         } catch (\Exception $e) {

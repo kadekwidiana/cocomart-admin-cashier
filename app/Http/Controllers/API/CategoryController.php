@@ -12,10 +12,10 @@ use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    public function images(string $oxy_category_id)
+    public function images(string $oxyCategoryId)
     {
         try {
-            $images = CategoryImage::where('oxy_category_id', $oxy_category_id)->get();
+            $images = CategoryImage::where('oxy_category_id', $oxyCategoryId)->get();
 
             return ApiResponse::success(CategoryImageResource::collection($images), 'Images retrieved successfully');
         } catch (\Exception $e) {

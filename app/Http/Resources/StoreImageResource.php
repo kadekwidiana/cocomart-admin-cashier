@@ -16,10 +16,12 @@ class StoreImageResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'oxy_store_id' => $this->oxy_store_id,
-            'image' => $this->image ? url($this->image) : url('/assets/images/store-default.png'),
-            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
-            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
+            'oxyStoreId' => $this->oxy_store_id,
+            'image' => $this->image
+                ? url($this->image)
+                : url('/assets/images/store-default.png'),
+            'createdAt' => $this->created_at?->format('Y-m-d H:i:s'),
+            'updatedAt' => $this->updated_at?->format('Y-m-d H:i:s'),
         ];
     }
 }
