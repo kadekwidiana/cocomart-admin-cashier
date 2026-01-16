@@ -4,6 +4,7 @@ use App\Helpers\ApiResponse;
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\ImageSliderController;
 use App\Http\Controllers\API\ItemMasterController;
+use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\PromoController;
 use App\Http\Controllers\API\StoreController;
 use Illuminate\Http\Request;
@@ -58,6 +59,13 @@ Route::prefix('v1')->group(function () {
                 data: null,
                 message: 'Welcome to the Protected API'
             );
+        });
+
+        // notification
+        Route::prefix('notification')->group(function () {
+            Route::get('/customer/{oxyCustomerId}', [NotificationController::class, 'index']);
+            Route::get('count', [NotificationController::class, 'count']);
+            Route::post('read', [NotificationController::class, 'read']);
         });
     });
 });
