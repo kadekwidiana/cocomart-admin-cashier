@@ -30,21 +30,39 @@ class CategoryController extends Controller
     public function getCategories(Request $request)
     {
         try {
-            $validated = $request->validate([
-                'name' => 'nullable|string',
-                'code' => 'nullable|string',
-                'page' => 'nullable|integer|min:1',
-                'size' => 'nullable|integer|min:1|max:100',
-            ]);
-
             $oxyAccessToken = OxyApiToken::getAccessToken();
 
             $response = CategoryOxyService::getCategories(
                 token: $oxyAccessToken,
-                name: $validated['name'] ?? null,
-                code: $validated['code'] ?? null,
-                page: $validated['page'] ?? 1,
-                size: $validated['size'] ?? 10,
+                name: $request->name ?? null,
+                code: $request->code ?? null,
+                page: $request->page ?? 0,
+                size: $request->size ?? 20,
+            );
+
+            if (!$response['success']) {
+                return response()->json($response['error'], $response['code'] ?? 500);
+            }
+
+            return response()->json($response['data'], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Internal server error',
+            ], 500);
+        }
+    }
+
+    public function getSubCategories(Request $request)
+    {
+        try {
+            $oxyAccessToken = OxyApiToken::getAccessToken();
+
+            $response = CategoryOxyService::getCategories(
+                token: $oxyAccessToken,
+                name: $request->name ?? null,
+                code: $request->code ?? null,
+                page: $request->page ?? 0,
+                size: $request->size ?? 20,
             );
 
             if (!$response['success']) {

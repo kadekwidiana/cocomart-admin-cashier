@@ -30,17 +30,12 @@ class StoreController extends Controller
     public function getLocations(Request $request)
     {
         try {
-            $validated = $request->validate([
-                'name' => 'nullable|string',
-                'code' => 'nullable|string',
-            ]);
-
             $oxyAccessToken = OxyApiToken::getAccessToken();
 
             $response = StoreOxyService::getLocations(
                 token: $oxyAccessToken,
-                name: $validated['name'] ?? null,
-                code: $validated['code'] ?? null
+                name: $request->name ?? null,
+                code: $request->code ?? null,
             );
 
             if (!$response['success']) {
