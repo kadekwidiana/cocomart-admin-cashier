@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\CategoryController;
 use App\Http\Controllers\API\ItemMasterController;
+use App\Http\Controllers\API\PromoController;
 use App\Http\Controllers\API\StoreController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -34,5 +35,11 @@ Route::prefix('v1')->group(function () {
     Route::prefix('store')->group(function () {
         Route::get('/images/{oxy_store_id}', [StoreController::class, 'images']);
         Route::get('/locations', [StoreController::class, 'getLocations']);
+    });
+
+    // promo
+    Route::prefix('promo')->group(function () {
+        Route::get('', [PromoController::class, 'index']);
+        Route::get('count', [PromoController::class, 'count']);
     });
 });
