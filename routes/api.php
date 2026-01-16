@@ -22,9 +22,11 @@ Route::prefix('v1')->group(function () {
 
     Route::prefix('category')->group(function () {
         Route::get('/images/{oxy_category_id}', [CategoryController::class, 'images']);
+        Route::get('/', [CategoryController::class, 'getCategories']);
     });
 
     Route::prefix('store')->group(function () {
         Route::get('/images/{oxy_store_id}', [StoreController::class, 'images']);
+        Route::get('/locations', [StoreController::class, 'getLocations']);
     });
 });
