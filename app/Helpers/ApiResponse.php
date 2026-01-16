@@ -19,7 +19,7 @@ class ApiResponse
         $response = [
             'success' => true,
             'message' => $message,
-            'timestamp' => now()->toIso8601String(),
+            'timestamp' => now()->format('Y-m-d H:i:s'),
         ];
 
         if (isset($data['pagination'])) {
@@ -63,7 +63,7 @@ class ApiResponse
         $response = [
             'success' => false,
             'message' => $message,
-            'timestamp' => now()->toIso8601String()
+            'timestamp' => now()->format('Y-m-d H:i:s')
         ];
 
         if ($data) {
