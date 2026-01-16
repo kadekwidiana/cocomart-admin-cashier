@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\CategoryController;
+use App\Http\Controllers\API\ImageSliderController;
 use App\Http\Controllers\API\ItemMasterController;
 use App\Http\Controllers\API\PromoController;
 use App\Http\Controllers\API\StoreController;
@@ -41,5 +42,10 @@ Route::prefix('v1')->group(function () {
     Route::prefix('promo')->group(function () {
         Route::get('', [PromoController::class, 'index']);
         Route::get('count', [PromoController::class, 'count']);
+    });
+
+    // image slider
+    Route::prefix('image-slider')->group(function () {
+        Route::get('', [ImageSliderController::class, 'index']);
     });
 });
