@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TransactionStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -29,6 +30,7 @@ class Transaction extends Model
         'discount' => 'decimal:2',
         'shipping_cost' => 'decimal:2',
         'total' => 'decimal:2',
+        'status' => TransactionStatus::class,
     ];
 
     public function items()

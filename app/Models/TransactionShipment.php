@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TransactionShipmentStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -18,6 +19,10 @@ class TransactionShipment extends Model
         'grab_shipping_cost',
         'status',
         'grab_json_response',
+    ];
+
+    protected $casts = [
+        'status' => TransactionShipmentStatus::class,
     ];
 
     public function transaction()

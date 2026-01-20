@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TransactionPickupStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -20,6 +21,10 @@ class TransactionPickup extends Model
         'receiver_name',
         'receiver_phone_number',
         'status',
+    ];
+
+    protected $casts = [
+        'status' => TransactionPickupStatus::class,
     ];
 
     public function transaction()
