@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             CategoryImageSeeder::class,
             ItemMasterImageSeeder::class,
-            StoreImageSeeder::class,
+            LocationImageSeeder::class,
             ImageSliderSeeder::class,
             PromoSeeder::class,
             TransactionSeeder::class,

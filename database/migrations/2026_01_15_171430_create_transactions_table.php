@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
             $table->string('oxy_customer_id');
-            $table->string('oxy_store_id');
+            $table->string('oxy_location_id');
             $table->string('status')->default('PENDING');
             $table->enum('fulfillment_type', ['PICKUP', 'SHIPMENT'])->default('PICKUP');
             $table->text('payment_token')->nullable();

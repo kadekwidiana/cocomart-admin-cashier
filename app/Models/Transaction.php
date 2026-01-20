@@ -14,7 +14,7 @@ class Transaction extends Model
 
     protected $fillable = [
         'oxy_customer_id',
-        'oxy_store_id',
+        'oxy_location_id',
         'status',
         'fulfillment_type',
         'payment_token',

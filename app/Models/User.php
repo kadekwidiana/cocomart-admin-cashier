@@ -25,7 +25,7 @@ class User extends Authenticatable
         'phone_number',
         'address',
         'is_active',
-        'oxy_store_id',
+        'oxy_location_id',
     ];
 
     /**

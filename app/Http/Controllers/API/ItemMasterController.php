@@ -283,11 +283,11 @@ class ItemMasterController extends Controller
 
             $itemMasters = [];
 
-            foreach ($validated['itemMasterIds'] as $id) {
+            foreach ($validated['oxyItemMasterIds'] as $id) {
                 $response = ItemMasterOxyService::getItemMasterDetail(
                     token: $oxyAccessToken,
                     itemMasterId: $id,
-                    locationId: $validated['storeId'] ?? null,
+                    locationId: $validated['oxyLocationId'] ?? null,
                     page: 0,
                     size: 1
                 );

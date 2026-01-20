@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class StoreImageResource extends JsonResource
+class LocationImageResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,7 +16,7 @@ class StoreImageResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'oxyStoreId' => $this->oxy_store_id,
+            'oxyLocationId' => $this->oxy_location_id,
             'image' => $this->image
                 ? url($this->image)
                 : url('/assets/images/store-default.png'),

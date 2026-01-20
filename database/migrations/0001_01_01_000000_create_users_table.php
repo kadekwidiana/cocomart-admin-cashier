@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('phone_number')->nullable();
             $table->string('address')->nullable();
             $table->boolean('is_active')->default(true);
-            $table->string('oxy_store_id')->nullable();
+            $table->string('oxy_location_id')->nullable();
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

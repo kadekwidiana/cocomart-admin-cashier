@@ -26,8 +26,8 @@ class GetItemMasterByIdsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'itemMasterIds' => 'required|array',
-            'storeId' => 'nullable|string',
+            'oxyItemMasterIds' => 'required|array',
+            'oxyLocationId' => 'nullable|string',
         ];
     }
 

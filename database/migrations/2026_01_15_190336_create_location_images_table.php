@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('store_images', function (Blueprint $table) {
+        Schema::create('location_images', function (Blueprint $table) {
             $table->id();
-            $table->string('oxy_store_id');
+            $table->string('oxy_location_id');
             $table->text('image');
             $table->timestamps();
             $table->softDeletes();
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('store_images');
+        Schema::dropIfExists('location_images');
     }
 };

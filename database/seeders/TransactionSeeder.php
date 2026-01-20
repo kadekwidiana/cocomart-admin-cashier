@@ -17,7 +17,7 @@ class TransactionSeeder extends Seeder
             [
                 'id' => 1,
                 'oxy_customer_id' => '118230201140915581',
-                'oxy_store_id' => '5044049223204002284',
+                'oxy_location_id' => '5044049223204002284',
                 'status' => 'PENDING',
                 'fulfillment_type' => 'PICKUP',
                 'payment_token' => null,
@@ -31,7 +31,7 @@ class TransactionSeeder extends Seeder
             [
                 'id' => 2,
                 'oxy_customer_id' => '31230908051632942',
-                'oxy_store_id' => '6660012',
+                'oxy_location_id' => '6660012',
                 'status' => 'PAID',
                 'fulfillment_type' => 'SHIPMENT',
                 'payment_token' => 'PAYMENT_TOKEN_SAMPLE_123',

@@ -4,20 +4,21 @@ namespace App\Http\Controllers\API;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Resources\StoreImageResource;
+use App\Http\Resources\LocationImageResource;
+use App\Models\LocationImage;
 use App\Models\OxyApiToken;
 use App\Models\StoreImage;
 use Illuminate\Http\Request;
 use App\Services\External\Oxy\StoreOxyService;
 
-class StoreController extends Controller
+class LocationController extends Controller
 {
-    public function images(string $oxyStoreId)
+    public function images(string $oxyLocationId)
     {
         try {
-            $images = StoreImage::where('oxy_store_id', $oxyStoreId)->get();
+            $images = LocationImage::where('oxy_location_id', $oxyLocationId)->get();
 
-            return ApiResponse::success(StoreImageResource::collection($images), 'Images retrieved successfully');
+            return ApiResponse::success(LocationImageResource::collection($images), 'Images retrieved successfully');
         } catch (\Exception $e) {
             return ApiResponse::error(
                 [

@@ -6,14 +6,14 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class StoreImageSeeder extends Seeder
+class LocationImageSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        $storeIds = [
+        $locationIds = [
             '5044049223204002284',
             '6660012',
             '504404798424731831',
@@ -94,16 +94,16 @@ class StoreImageSeeder extends Seeder
 
         $id = 1;
 
-        $payload = array_map(function ($storeId) use (&$id) {
+        $payload = array_map(function ($locationId) use (&$id) {
             return [
                 'id' => $id++,
-                'oxy_store_id' => $storeId,
+                'oxy_location_id' => $locationId,
                 'image' => '/assets/images/store-default.png',
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
-        }, $storeIds);
+        }, $locationIds);
 
-        DB::table('store_images')->insert($payload);
+        DB::table('location_images')->insert($payload);
     }
 }

@@ -6,14 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class StoreImage extends Model
+class LocationImage extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'store_images';
+    protected $table = 'location_images';
 
     protected $fillable = [
-        'oxy_store_id',
+        'oxy_location_id',
         'image',
     ];
 }

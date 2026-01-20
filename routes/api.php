@@ -6,7 +6,7 @@ use App\Http\Controllers\API\ImageSliderController;
 use App\Http\Controllers\API\ItemMasterController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\PromoController;
-use App\Http\Controllers\API\StoreController;
+use App\Http\Controllers\API\LocationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -36,9 +36,9 @@ Route::prefix('v1')->group(function () {
         Route::get('/sub', [CategoryController::class, 'getSubCategories']);
     });
 
-    Route::prefix('store')->group(function () {
-        Route::get('/images/{oxyStoreId}', [StoreController::class, 'images']);
-        Route::get('/locations', [StoreController::class, 'getLocations']);
+    Route::prefix('location')->group(function () {
+        Route::get('', [LocationController::class, 'getLocations']);
+        Route::get('/images/{oxyLocationId}', [LocationController::class, 'images']);
     });
 
     // promo
