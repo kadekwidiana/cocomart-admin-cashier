@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('transactions', function (Blueprint $table) {
-            $table->id();
+            // $table->id();
+            $table->string('id')->primary();
             $table->string('oxy_customer_id');
             $table->string('oxy_location_id');
             $table->string('status')->default('PENDING');

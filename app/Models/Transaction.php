@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TransactionFulfillmentType;
 use App\Enums\TransactionStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,6 +15,7 @@ class Transaction extends Model
     protected $table = 'transaction';
 
     protected $fillable = [
+        'id',
         'oxy_customer_id',
         'oxy_location_id',
         'status',
@@ -31,6 +33,7 @@ class Transaction extends Model
         'shipping_cost' => 'decimal:2',
         'total' => 'decimal:2',
         'status' => TransactionStatus::class,
+        'fulfillment_type' => TransactionFulfillmentType::class
     ];
 
     public function items()

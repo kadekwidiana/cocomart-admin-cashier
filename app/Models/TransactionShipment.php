@@ -18,6 +18,9 @@ class TransactionShipment extends Model
         'grab_delivery_id',
         'grab_shipping_cost',
         'status',
+        'receiver_name',
+        'receiver_phone_number',
+        'receiver_address',
         'grab_json_response',
     ];
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\API\ItemMasterController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\PromoController;
 use App\Http\Controllers\API\LocationController;
+use App\Http\Controllers\API\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -75,6 +76,11 @@ Route::prefix('v1')->group(function () {
             Route::delete('/remove-from-wishlist/{oxyItemMasterId}/customer/{oxyCustomerId}', [ItemMasterController::class, 'removeFromWishList']);
             Route::get('/wishlist-by-customer/{oxyCustomerId}', [ItemMasterController::class, 'getItemMasterWishlistByCustomer']);
             Route::post('/by-ids', [ItemMasterController::class, 'getItemMasterByIds']);
+        });
+
+        // transaction
+        Route::prefix('transaction')->group(function () {
+            Route::post('', [TransactionController::class, 'store']);
         });
     });
 });

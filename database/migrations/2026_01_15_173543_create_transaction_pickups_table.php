@@ -13,7 +13,11 @@ return new class extends Migration
     {
         Schema::create('transaction_pickups', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('transaction_id')->constrained('transactions')->onDelete('cascade');
+            $table->string('transaction_id');
+            $table->foreign('transaction_id')
+                ->references('id')
+                ->on('transactions')
+                ->onDelete('cascade');
             $table->string('pickup_code');
             $table->dateTime('pickup_time')->nullable();
             $table->dateTime('pickup_end_time')->nullable();

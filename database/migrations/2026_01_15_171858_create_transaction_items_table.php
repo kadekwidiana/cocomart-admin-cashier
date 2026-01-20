@@ -13,7 +13,11 @@ return new class extends Migration
     {
         Schema::create('transaction_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('transaction_id')->constrained('transactions')->onDelete('cascade');
+            $table->string('transaction_id');
+            $table->foreign('transaction_id')
+                ->references('id')
+                ->on('transactions')
+                ->onDelete('cascade');
             $table->string('oxy_item_master_id');
             $table->integer('quantity');
             $table->decimal('price', 12, 2);
