@@ -12,7 +12,7 @@ class Transaction extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'transaction';
+    protected $table = 'transactions';
 
     protected $fillable = [
         'id',

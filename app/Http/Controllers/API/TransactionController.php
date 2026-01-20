@@ -7,6 +7,8 @@ use App\Enums\TransactionPickupStatus;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\Transaction\CreateTransactionRequest;
+use App\Http\Resources\PaginationResource;
+use App\Http\Resources\Transaction\TransactionResource;
 use App\Models\OxyApiToken;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
@@ -19,6 +21,49 @@ use Illuminate\Support\Str;
 
 class TransactionController extends Controller
 {
+    public function index(Request $request, string $oxyCustomerId)
+    {
+        try {
+            $page = $request->page ?? 1;
+            $size = $request->size ?? 10;
+            $transactionId = $request->transactionId ?? null;
+
+            if (!$oxyCustomerId) {
+                return ApiResponse::error(
+                    data: null,
+                    message: 'Oxy customer id is required',
+                    statusCode: Response::HTTP_UNAUTHORIZED
+                );
+            }
+
+            $transactions = Transaction::query()
+                ->with(['items', 'shipment', 'pickup'])
+                ->where('oxy_customer_id', $oxyCustomerId)
+                ->when(
+                    $transactionId,
+                    fn($q) => $q->where('id', 'like', '%' . $transactionId . '%')
+                )
+                ->paginate(
+                    $size,
+                    ['*'],
+                    'page',
+                    $page
+                )->appends([
+                    'page' => $page,
+                    'size' => $size
+                ]);
+
+            return ApiResponse::success([
+                'data' => TransactionResource::collection($transactions),
+                'pagination' => new PaginationResource($transactions),
+            ], 'Transactions retrieved successfully');
+        } catch (\Throwable $e) {
+            return ApiResponse::error([
+                'detail' => $e->getMessage(),
+            ]);
+        }
+    }
+
     public function store(CreateTransactionRequest $request)
     {
         DB::beginTransaction();

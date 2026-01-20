@@ -16,7 +16,7 @@ class TransactionSeeder extends Seeder
         DB::table('transactions')->insert([
             [
                 'id' => 1,
-                'oxy_customer_id' => '118230201140915581',
+                'oxy_customer_id' => '6277952820',
                 'oxy_location_id' => '5044049223204002284',
                 'status' => 'PENDING',
                 'fulfillment_type' => 'PICKUP',
