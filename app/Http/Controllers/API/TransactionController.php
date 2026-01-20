@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Enums\TransactionFulfillmentType;
 use App\Enums\TransactionPickupStatus;
+use App\Enums\TransactionShipmentStatus;
+use App\Enums\TransactionStatus;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\Transaction\CreateTransactionRequest;
@@ -67,6 +69,7 @@ class TransactionController extends Controller
     public function store(CreateTransactionRequest $request)
     {
         DB::beginTransaction();
+
         try {
             $validated = $request->validated();
 
@@ -75,140 +78,142 @@ class TransactionController extends Controller
             $subtotal = 0;
             $itemMasters = [];
 
-            // check stock items master in oxy
+            /**
+             * ======================================
+             * 1. VALIDASI ITEM & CEK STOK OXY
+             * ======================================
+             */
             foreach ($validated['items'] as $item) {
+
                 $response = ItemMasterOxyService::getItemMasterDetail(
                     token: $oxyAccessToken,
-                    itemMasterId: $item->oxyItemMasterId,
+                    itemMasterId: $item['oxyItemMasterId'],
                     locationId: $validated['oxyLocationId'] ?? null,
                     page: 0,
                     size: 1
                 );
 
-                // if item master not found
                 if (
                     ($response['success'] ?? false) !== true ||
-                    !isset($response['data']['data']) ||
-                    empty($response['data']['data']) ||
-                    !isset($response['data']['data'][0])
+                    empty($response['data']['data'][0])
                 ) {
-                    return ApiResponse::error(
-                        data: [
-                            'detail' => 'Item master not found' . ' oxyItemMasterId: ' . $item->oxyItemMasterId,
-                        ],
-                        message: 'Item master not found' . ' oxyItemMasterId: ' . $item->oxyItemMasterId,
-                        statusCode: Response::HTTP_NOT_FOUND
+                    throw new \Exception(
+                        'Item master not found: ' . $item['oxyItemMasterId']
                     );
                 }
 
-                // if stock not enough
-                if (
-                    ($response['data']['data'][0]['stocks'][0]['qty'] ?? 0) < $item->quantity
-                ) {
-                    return ApiResponse::error(
-                        data: [
-                            'detail' => 'Stock not enough' . ' oxyItemMasterId: ' . $item->oxyItemMasterId,
-                        ],
-                        message: 'Stock not enough' . ' oxyItemMasterId: ' . $item->oxyItemMasterId,
-                        statusCode: Response::HTTP_CONFLICT
+                $itemMaster = $response['data']['data'][0];
+
+                $stock = $itemMaster['stocks'][0]['qty'] ?? 0;
+                if ($stock < $item['qty']) {
+                    throw new \Exception(
+                        'Stock not enough: ' . $item['oxyItemMasterId']
                     );
                 }
 
-                $subtotal += $response['data']['data'][0]['prices'][0]['sellingPrice'] * $item->quantity;
-                $itemMasters[] = $response['data']['data'][0];
+                $price = $itemMaster['prices'][0]['sellingPrice'];
+                $subtotal += $price * $item['qty'];
+
+                $itemMasters[] = $itemMaster;
             }
 
-            // check ongkir to grab
-            $grabResponse = [
-                'grab_delivery_id' => (string) Str::ulid(),
-                'grab_shipping_cost' => 0,
-                'status' => 'PENDING',
-                'receiver_name' => $validated['receiverName'],
-                'receiver_phone_number' => $validated['receiverPhoneNumber'],
-                'receiver_address' => $validated['shipmentAddress'],
-                'shipment_latitude' => $validated['shipmentLatitude'],
-                'shipment_longitude' => $validated['shipmentLongitude'],
-            ];
-
-            // create transaction
-            $transactionId = (string) Str::ulid();
-
+            /**
+             * ======================================
+             * 2. CREATE TRANSACTION
+             * ======================================
+             */
             $transaction = Transaction::create([
-                'id' => $transactionId,
+                'id' => (string) Str::ulid(),
                 'oxy_customer_id' => $validated['oxyCustomerId'],
                 'oxy_location_id' => $validated['oxyLocationId'],
-                'status' => 'PENDING',
+                'status' => TransactionStatus::PENDING,
                 'fulfillment_type' => $validated['fulfillmentType'],
                 'subtotal' => $subtotal,
-                'shipping_cost' => $grabResponse['grab_shipping_cost'],
-                'total' => $subtotal + $grabResponse['grab_shipping_cost'],
+                'shipping_cost' => 0,
+                'total' => $subtotal,
             ]);
 
-            $items = $validated['items'];
+            /**
+             * ======================================
+             * 3. CREATE TRANSACTION ITEMS
+             * ======================================
+             */
+            $itemsByMasterId = collect($validated['items'])
+                ->keyBy('oxyItemMasterId');
 
-            // create transaction items
-            foreach ($itemMasters as $item) {
+            foreach ($itemMasters as $itemMaster) {
 
-                $itemMasterId = $item->itemMasterId;
-
-                // ambil qty dari request
-                $qty = $items[$itemMasterId]['qty'];
-
-                $price = $item['prices'][0]['sellingPrice'];
-                $subtotal = $price * $qty;
+                $itemMasterId = $itemMaster['itemMasterId'];
+                $qty = $itemsByMasterId[$itemMasterId]['qty'];
+                $price = $itemMaster['prices'][0]['sellingPrice'];
 
                 TransactionItem::create([
-                    'transaction_id' => $transactionId,
+                    'transaction_id' => $transaction->id,
                     'oxy_item_master_id' => $itemMasterId,
                     'quantity' => $qty,
                     'price' => $price,
-                    'subtotal' => $subtotal,
+                    'subtotal' => $price * $qty,
                 ]);
-
-                // update stock item master oxy
-                // integrasi ke api oxy
             }
 
-            // if SHIPMENT create transaction shipment
+            /**
+             * ======================================
+             * 4. SHIPMENT
+             * ======================================
+             */
             if ($validated['fulfillmentType'] === TransactionFulfillmentType::SHIPMENT->value) {
-                $transaction->shipment()->create([
-                    'transaction_id' => $transactionId,
-                    'grab_delivery_id' => $grabResponse['grab_delivery_id'],
-                    'grab_shipping_cost' => $grabResponse['grab_shipping_cost'],
-                    'status' => $grabResponse['status'],
-                    'receiver_name' => $grabResponse['receiver_name'],
-                    'receiver_phone_number' => $grabResponse['receiver_phone_number'],
-                    'receiver_address' => $grabResponse['receiver_address'],
-                    'grab_json_response' => json_encode($grabResponse),
-                ]);
-            }
 
-            // if PICKUP create transaction pickup
-            if ($validated['fulfillmentType'] === TransactionFulfillmentType::PICKUP->value) {
-                $transaction->pickup()->create([
-                    'transaction_id' => $transactionId,
-                    'pickup_code' => (string) Str::ulid(),
-                    'pickup_time' => $validated['pickupTime'],
+                // sementara dummy (API Grab async nanti)
+                $shipmentPayload = [
+                    'grab_delivery_id' => (string) Str::ulid(),
+                    'grab_shipping_cost' => 0,
+                    'status' => TransactionShipmentStatus::PENDING,
                     'receiver_name' => $validated['receiverName'],
                     'receiver_phone_number' => $validated['receiverPhoneNumber'],
-                    'status' => TransactionPickupStatus::PENDING->value,
+                    'receiver_address' => $validated['shipmentAddress'],
+                    'grab_json_response' => json_encode([
+                        'note' => 'Grab integration pending'
+                    ]),
+                ];
+
+                $transaction->shipment()->create($shipmentPayload);
+
+                // update total jika ada ongkir
+                $transaction->update([
+                    'shipping_cost' => $shipmentPayload['grab_shipping_cost'],
+                    'total' => $transaction->subtotal + $shipmentPayload['grab_shipping_cost'],
+                ]);
+            }
+
+            /**
+             * ======================================
+             * 5. PICKUP
+             * ======================================
+             */
+            if ($validated['fulfillmentType'] === TransactionFulfillmentType::PICKUP->value) {
+
+                $transaction->pickup()->create([
+                    'pickup_code' => (string) Str::ulid(),
+                    'pickup_time' => $validated['pickupTime'],
+                    'pickup_end_time' => $validated['pickupEndTime'] ?? null,
+                    'receiver_name' => $validated['receiverName'],
+                    'receiver_phone_number' => $validated['receiverPhoneNumber'],
+                    'status' => TransactionPickupStatus::PENDING,
                 ]);
             }
 
             DB::commit();
 
             return ApiResponse::success(
-                data: $transactionId,
+                data: $transaction->id,
                 message: 'Transaction created successfully'
             );
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
 
-            return ApiResponse::error(
-                [
-                    'detail' => $e->getMessage(),
-                ]
-            );
+            return ApiResponse::error([
+                'detail' => $e->getMessage(),
+            ], 'Failed to create transaction');
         }
     }
 }
