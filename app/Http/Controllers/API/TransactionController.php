@@ -66,6 +66,24 @@ class TransactionController extends Controller
         }
     }
 
+    public function show(string $transactionId)
+    {
+        try {
+            $transaction = Transaction::query()
+                ->with(['items', 'shipment', 'pickup'])
+                ->where('id', $transactionId)
+                ->first();
+
+            return ApiResponse::success([
+                'data' => new TransactionResource($transaction),
+            ], 'Transaction retrieved successfully');
+        } catch (\Throwable $e) {
+            return ApiResponse::error([
+                'detail' => $e->getMessage(),
+            ]);
+        }
+    }
+
     public function store(CreateTransactionRequest $request)
     {
         DB::beginTransaction();

@@ -81,6 +81,7 @@ Route::prefix('v1')->group(function () {
         // transaction
         Route::prefix('transaction')->group(function () {
             Route::get('/list/{oxyCustomerId}', [TransactionController::class, 'index']);
+            Route::get('/{transactionId}', [TransactionController::class, 'show']);
             Route::post('', [TransactionController::class, 'store']);
         });
     });
