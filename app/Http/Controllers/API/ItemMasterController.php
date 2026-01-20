@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\ItemMaster\AddToWishListRequest;
+use App\Http\Requests\API\ItemMaster\GetItemMasterByIdsRequest;
 use App\Http\Resources\AddToWishListResponseResource;
 use App\Http\Resources\ItemMasterImageResource;
 use App\Models\ItemMasterImage;
@@ -265,6 +266,54 @@ class ItemMasterController extends Controller
             return ApiResponse::success(
                 $itemMasters,
                 'Wishlist retrieved successfully'
+            );
+        } catch (\Exception $e) {
+            return ApiResponse::error([
+                'detail' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function getItemMasterByIds(GetItemMasterByIdsRequest $request)
+    {
+        try {
+            $oxyAccessToken = OxyApiToken::getAccessToken();
+
+            $validated = $request->validated();
+
+            $itemMasters = [];
+
+            foreach ($validated['itemMasterIds'] as $id) {
+                $response = ItemMasterOxyService::getItemMasterDetail(
+                    token: $oxyAccessToken,
+                    itemMasterId: $id,
+                    locationId: $validated['storeId'] ?? null,
+                    page: 0,
+                    size: 1
+                );
+
+                //  guard ketat untuk response OXY
+                if (
+                    ($response['success'] ?? false) !== true ||
+                    !isset($response['data']['data']) ||
+                    empty($response['data']['data']) ||
+                    !isset($response['data']['data'][0])
+                ) {
+                    // optional: log untuk monitoring
+                    Log::warning('Failed get item master from OXY', [
+                        'oxy_item_master_id' => $id,
+                        'response' => $response,
+                    ]);
+
+                    continue; // skip item ini
+                }
+
+                $itemMasters[] = $response['data']['data'][0];
+            }
+
+            return ApiResponse::success(
+                $itemMasters,
+                'Item masters retrieved successfully'
             );
         } catch (\Exception $e) {
             return ApiResponse::error([

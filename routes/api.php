@@ -74,6 +74,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/add-to-wishlist', [ItemMasterController::class, 'addToWishList']);
             Route::delete('/remove-from-wishlist/{oxyItemMasterId}/customer/{oxyCustomerId}', [ItemMasterController::class, 'removeFromWishList']);
             Route::get('/wishlist-by-customer/{oxyCustomerId}', [ItemMasterController::class, 'getItemMasterWishlistByCustomer']);
+            Route::post('/by-ids', [ItemMasterController::class, 'getItemMasterByIds']);
         });
     });
 });
