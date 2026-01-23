@@ -1,6 +1,7 @@
 import { usePage } from "@inertiajs/react";
 import { Sidebar } from "flowbite-react";
 import { HiOutlineChartPie } from "react-icons/hi";
+import { TfiLayoutSliderAlt } from "react-icons/tfi";
 
 export default function BackpageSidebar({ isVisible }) {
     const { auth } = usePage().props;
@@ -23,6 +24,11 @@ export default function BackpageSidebar({ isVisible }) {
                             href="/dashboard"
                             label="Dashboard"
                             icon={HiOutlineChartPie}
+                        />
+                        <SidebarMenu
+                            href="/image-sliders"
+                            label="Image Slider"
+                            icon={TfiLayoutSliderAlt}
                         />
                     </Sidebar.ItemGroup>
                 </Sidebar.Items>

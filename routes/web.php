@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ImageSliderController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -26,6 +27,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/profile/{userId}', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    // image slider
+    Route::resource('image-sliders', ImageSliderController::class);
+    Route::post('image-sliders/{id}/update', [ImageSliderController::class, 'update'])->name('image-sliders.update');
 });
 
 require __DIR__ . '/auth.php';
+
+
+// storage link dan cronjob tidak bisa, jadi pake cara ini
+Route::get('/storage/{folder}/{filename}', function ($folder, $filename) {
+    $allowedFolders = ['image-sliders'];
+
+    if (!in_array($folder, $allowedFolders)) {
+        abort(404);
+    }
+
+    $path = storage_path("app/public/{$folder}/{$filename}");
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    return response()->file($path);
+});
