@@ -20,31 +20,43 @@ class ImageSliderController extends Controller
     public function index(Request $request)
     {
         try {
-            $search = $request->input('search');
-            $perPage = $request->perpage ?? 10;
+            $perpage   = $request->integer('perpage', 10);
+            $link      = $request->input('link');
+            $index     = $request->input('index');
+            $is_active = $request->input('is_active');
 
             $query = ImageSlider::query();
 
-            if ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('link', 'like', "%{$search}%")
-                        ->orWhere('index', 'like', "%{$search}%");
-                });
+            if (!empty($link)) {
+                $query->where('link', 'like', "%{$link}%");
+            }
+
+            if (!empty($index)) {
+                $query->where('index', $index);
+            }
+
+            if ($is_active !== null && $is_active !== '') {
+                $query->where('is_active', (int) $is_active);
             }
 
             $imageSliders = $query
                 ->latest()
-                ->paginate($perPage)
-                ->appends(['search' => $search]);
+                ->paginate($perpage)
+                ->withQueryString();
 
             return Inertia::render('Backpage/ImageSlider/Index', [
                 'title' => 'Image Slider',
                 'imageSliders' => $imageSliders,
-                'searchValue' => $search,
+                'filters' => [
+                    'perpage'   => $perpage,
+                    'link'      => $link,
+                    'index'     => $index,
+                    'is_active' => $is_active,
+                ],
             ]);
-        } catch (Exception $e) {
+        } catch (\Throwable $e) {
             return back()->withErrors([
-                'message' => 'Failed to fetch image sliders'
+                'message' => 'Failed to fetch image sliders',
             ]);
         }
     }

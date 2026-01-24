@@ -6,58 +6,108 @@ import { PER_PAGES } from "@/Constants/dataOptions";
 import useDeleteImageSlider from "@/Features/ImageSliders/useDeleteImageSlider";
 import useGetImageSliders from "@/Features/ImageSliders/useGetImageSliders";
 import BackpageLayout from "@/Layouts/BackpageLayout";
-import { Button, Select, Table, TextInput } from "flowbite-react";
+import { Link } from "@inertiajs/react";
+import { Button, Label, Select, Table, TextInput } from "flowbite-react";
 import { FaInfoCircle, FaTrash } from "react-icons/fa";
 
 export default function ImageSliderPage() {
-    const {
-        imageSliders,
-        isLoading,
-        perpage,
-        searchValue,
-        debouncedHandleSearch,
-        handleChangePerPage,
-    } = useGetImageSliders();
+    const { imageSliders, isLoading, params, handleChange, getData } =
+        useGetImageSliders();
 
     const { deleteDataConfirm } = useDeleteImageSlider();
 
-    console.log(imageSliders);
-
     return (
         <BackpageLayout>
-            <div className="flex w-full flex-col items-start justify-start gap-4 md:flex-row md:items-center md:gap-2">
-                <Select
-                    defaultValue={perpage.current}
-                    onChange={handleChangePerPage}
-                    id="per-page"
-                    required
-                    className="min-w-20 max-w-20"
-                >
-                    {PER_PAGES.map((perPage) => (
-                        <option key={perPage} value={perPage}>
-                            {perPage}
-                        </option>
-                    ))}
-                </Select>
-                <TextInput
-                    id="base"
-                    type="search"
-                    placeholder="Cari data..."
-                    sizing="md"
-                    className="w-full"
-                    defaultValue={searchValue}
-                    onChange={debouncedHandleSearch}
-                />
-                <InputImageSliderModal
-                    trigger={
+            <div className="w-full grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6 items-end">
+                <div>
+                    <div className="mb-2 block">
+                        <Label htmlFor="perpage" value="Perpage" />
+                    </div>
+                    <Select
+                        id="perpage"
+                        value={params.perpage}
+                        onChange={(e) =>
+                            handleChange("perpage", e.target.value)
+                        }
+                    >
+                        {PER_PAGES.map((perpage) => (
+                            <option key={perpage} value={perpage}>
+                                {perpage}
+                            </option>
+                        ))}
+                    </Select>
+                </div>
+                <div>
+                    <div className="mb-2 block">
+                        <Label htmlFor="link" value="Link" />
+                    </div>
+                    <TextInput
+                        id="link"
+                        type="search"
+                        placeholder="Search by link..."
+                        value={params.link}
+                        onChange={(e) => handleChange("link", e.target.value)}
+                    />
+                </div>
+                <div>
+                    <div className="mb-2 block">
+                        <Label htmlFor="index" value="Index" />
+                    </div>
+                    <TextInput
+                        id="index"
+                        type="search"
+                        placeholder="Search by index..."
+                        value={params.index}
+                        onChange={(e) => handleChange("index", e.target.value)}
+                    />
+                </div>
+                <div>
+                    <div className="mb-2 block">
+                        <Label htmlFor="is_active" value="Status" />
+                    </div>
+                    <Select
+                        id="is_active"
+                        value={params.is_active}
+                        onChange={(e) =>
+                            handleChange("is_active", e.target.value)
+                        }
+                    >
+                        <option value="">Semua</option>
+                        <option value="1">Aktif</option>
+                        <option value="0">Tidak Aktif</option>
+                    </Select>
+                </div>
+                <div className="flex gap-2">
+                    <Button
+                        onClick={getData}
+                        color="none"
+                        type="button"
+                        className="bg-green-700/80 hover:bg-green-700/100 text-white text-nowrap w-fit"
+                    >
+                        Cari
+                    </Button>
+                    <Link href="/image-sliders">
                         <Button
                             color="none"
-                            className="bg-primary/80 hover:bg-primary/100 text-white text-nowrap"
+                            type="button"
+                            className="bg-red-700/80 hover:bg-red-700/100 text-white text-nowrap w-fit"
                         >
-                            Tambah Data
+                            Reset
                         </Button>
-                    }
-                />
+                    </Link>
+
+                    <InputImageSliderModal
+                        trigger={
+                            <Button
+                                color="none"
+                                type="button"
+                                className="bg-primary/80 hover:bg-primary/100 text-white text-nowrap w-fit"
+                            >
+                                Tambah Data
+                            </Button>
+                        }
+                    />
+                </div>
             </div>
             <div className="mt-4 overflow-x-auto">
                 <Table striped>
@@ -127,13 +177,7 @@ export default function ImageSliderPage() {
                 )}
             </div>
             {imageSliders.data.length > 0 && !isLoading && (
-                <ListDataPagination
-                    data={imageSliders}
-                    params={{
-                        perpage: perpage.current || 10,
-                        search: searchValue || "",
-                    }}
-                />
+                <ListDataPagination data={imageSliders} params={params} />
             )}
         </BackpageLayout>
     );

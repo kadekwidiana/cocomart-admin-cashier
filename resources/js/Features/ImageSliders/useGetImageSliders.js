@@ -1,57 +1,33 @@
 import { router, usePage } from '@inertiajs/react';
-import { debounce, pickBy } from 'lodash';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { pickBy } from 'lodash';
+import { useState } from 'react';
 
 export default function useGetImageSliders() {
-    const { imageSliders, searchValue } = usePage().props;
-    const perpage = useRef(imageSliders.per_page);
+    const { imageSliders, filters } = usePage().props;
+
     const [isLoading, setIsLoading] = useState(false);
-    const [search, setSearch] = useState('');
-
-    const handleChangePerPage = (e) => {
-        perpage.current = e.target.value;
-        getData();
-    };
-
-    const handleSearch = (e) => {
-        const value = e.target.value;
-        setSearch(value);
-        if (value === '') {
-            getData(true);
-        }
-    };
-
-    const debouncedHandleSearch = useMemo(() => {
-        return debounce(handleSearch, 500);
-    }, []);
-
-    useEffect(() => {
-        return () => {
-            debouncedHandleSearch.cancel();
-        };
+    const [params, setParams] = useState({
+        perpage: filters?.perpage ?? 10,
+        link: filters?.link ?? '',
+        index: filters?.index ?? '',
+        is_active: filters?.is_active ?? '',
     });
 
-    useEffect(() => {
-        if (search) {
-            getData();
-        }
-    }, [search]);
+    const handleChange = (key, value) => {
+        setParams((prev) => ({
+            ...prev,
+            [key]: value,
+        }));
+    };
 
-    const getData = (isSearchCleared = false) => {
+    const getData = () => {
         setIsLoading(true);
 
-        const params = pickBy({
-            perpage: perpage.current,
-            search: search ?? searchValue,
-        });
-
-        if (isSearchCleared) {
-            delete params.search;
-        }
+        const paramsRequest = pickBy(params, (v) => v !== '' && v !== null);
 
         router.get(
             route('image-sliders.index'),
-            params,
+            paramsRequest,
             {
                 preserveScroll: true,
                 preserveState: true,
@@ -63,10 +39,8 @@ export default function useGetImageSliders() {
     return {
         imageSliders,
         isLoading,
-        perpage,
-        searchValue,
-        debouncedHandleSearch,
-        handleChangePerPage,
+        params,
+        handleChange,
+        getData,
     };
-
 }
