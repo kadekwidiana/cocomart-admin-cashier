@@ -32,7 +32,7 @@ export function InputPromoModal({
                 size="5xl"
             >
                 <Modal.Header>
-                    {isUpdate ? "Detail Image Slider" : "Tambah Image Slider"}
+                    {isUpdate ? "Detail Promo" : "Tambah Promo"}
                 </Modal.Header>
                 <Modal.Body>
                     <form
