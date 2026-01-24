@@ -11,6 +11,7 @@ export default function useInputPromo(setOpenModal, isUpdate = false, promo) {
         is_active: 1,
         title: '',
         code: '',
+        discount_percentage: 0,
         start_date: '',
         end_date: '',
     };
@@ -20,6 +21,7 @@ export default function useInputPromo(setOpenModal, isUpdate = false, promo) {
         is_active: '',
         title: '',
         code: '',
+        discount_percentage: '',
         start_date: '',
         end_date: '',
     };
@@ -41,6 +43,7 @@ export default function useInputPromo(setOpenModal, isUpdate = false, promo) {
                 is_active: promo?.is_active ? 1 : 0,
                 title: promo?.title ?? '',
                 code: promo?.code ?? '',
+                discount_percentage: promo?.discount_percentage ?? 0,
                 start_date: promo?.start_date ?? '',
                 end_date: promo?.end_date ?? '',
             });

@@ -134,7 +134,7 @@ export function InputPromoModal({
                                 <div className="mb-2 block">
                                     <Label
                                         htmlFor="discount_percentage"
-                                        value="Discount Percentage*"
+                                        value="Discount Percentage (%)*"
                                         color={
                                             errors.discount_percentage
                                                 ? "failure"
@@ -145,8 +145,8 @@ export function InputPromoModal({
                                 <TextInput
                                     id="discount_percentage"
                                     name="discount_percentage"
-                                    type="text"
-                                    placeholder="Masukan discount_percentage..."
+                                    type="number"
+                                    placeholder="Masukan discount percentage..."
                                     value={formData.discount_percentage}
                                     onChange={handleChange}
                                     color={

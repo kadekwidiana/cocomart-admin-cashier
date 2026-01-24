@@ -6,6 +6,7 @@ import { PER_PAGES } from "@/Constants/dataOptions";
 import useDeletePromo from "@/Features/Promos/useDeletePromo";
 import useGetPromos from "@/Features/Promos/useGetPromos";
 import BackpageLayout from "@/Layouts/BackpageLayout";
+import { formatDateToIndonesian } from "@/Utils/formatDateToIndonesian";
 import { Link } from "@inertiajs/react";
 import { format } from "date-fns";
 import { Button, Label, Select, Table, TextInput } from "flowbite-react";
@@ -166,7 +167,8 @@ export default function PromoPage() {
                                     </Table.Cell>
                                     <Table.Cell>{promo.code ?? "-"}</Table.Cell>
                                     <Table.Cell>
-                                        {promo.discount_percentage ?? "-"}
+                                        {`${promo.discount_percentage} %` ??
+                                            "-"}
                                     </Table.Cell>
                                     <Table.Cell>
                                         {promo.is_active
@@ -174,16 +176,14 @@ export default function PromoPage() {
                                             : "Tidak Aktif"}
                                     </Table.Cell>
                                     <Table.Cell>
-                                        {format(
-                                            new Date(promo.start_date),
-                                            "dd-MM-yyyy",
-                                        ) ?? "-"}
+                                        {formatDateToIndonesian(
+                                            promo.start_date ?? "",
+                                        )}
                                     </Table.Cell>
                                     <Table.Cell>
-                                        {format(
-                                            new Date(promo.end_date),
-                                            "dd-MM-yyyy",
-                                        ) ?? "-"}
+                                        {formatDateToIndonesian(
+                                            promo.end_date ?? "",
+                                        )}
                                     </Table.Cell>
                                     <Table.Cell className="flex items-center justify-center gap-2">
                                         <InputPromoModal
