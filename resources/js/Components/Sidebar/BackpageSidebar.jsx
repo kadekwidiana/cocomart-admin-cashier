@@ -2,6 +2,7 @@ import { usePage } from "@inertiajs/react";
 import { Sidebar } from "flowbite-react";
 import { HiOutlineChartPie } from "react-icons/hi";
 import { TfiLayoutSliderAlt } from "react-icons/tfi";
+import { RiDiscountPercentLine } from "react-icons/ri";
 
 export default function BackpageSidebar({ isVisible }) {
     const { auth } = usePage().props;
@@ -29,6 +30,11 @@ export default function BackpageSidebar({ isVisible }) {
                             href="/image-sliders"
                             label="Image Slider"
                             icon={TfiLayoutSliderAlt}
+                        />
+                        <SidebarMenu
+                            href="/promos"
+                            label="Promo"
+                            icon={RiDiscountPercentLine}
                         />
                     </Sidebar.ItemGroup>
                 </Sidebar.Items>

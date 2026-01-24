@@ -41,7 +41,7 @@ export function InputImageSliderModal({
                                     <img
                                         src={imagePreview.image}
                                         alt="Preview"
-                                        className="w-full rounded-lg object-cover"
+                                        className="w-1/2 rounded-lg object-cover"
                                     />
                                 </div>
                             )}

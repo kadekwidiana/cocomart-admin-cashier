@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ImageSliderController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PromoController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -31,6 +32,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // image slider
     Route::resource('image-sliders', ImageSliderController::class);
     Route::post('image-sliders/{id}/update', [ImageSliderController::class, 'update'])->name('image-sliders.update');
+
+    // promo
+    Route::resource('promos', PromoController::class);
+    Route::post('promos/{id}/update', [PromoController::class, 'update'])->name('promos.update');
 });
 
 require __DIR__ . '/auth.php';
@@ -38,7 +43,7 @@ require __DIR__ . '/auth.php';
 
 // storage link dan cronjob tidak bisa, jadi pake cara ini
 Route::get('/storage/{folder}/{filename}', function ($folder, $filename) {
-    $allowedFolders = ['image-sliders'];
+    $allowedFolders = ['image-sliders', 'promos'];
 
     if (!in_array($folder, $allowedFolders)) {
         abort(404);
