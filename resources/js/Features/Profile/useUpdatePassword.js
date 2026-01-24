@@ -37,7 +37,7 @@ export default function useUpdatePassword() {
                 reset();
                 ToastTopEnd.fire({
                     icon: "success",
-                    title: "Kata sandi berhasil di ubah.",
+                    title: "Password changed successfully.",
                 });
             },
             onError: (errors) => {

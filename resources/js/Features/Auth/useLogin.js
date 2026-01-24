@@ -22,13 +22,13 @@ export default function useLogin() {
             onSuccess: () => {
                 ToastTopEnd.fire({
                     icon: "success",
-                    title: "Login Berhasil!",
+                    title: "Login Successful!",
                 });
             },
             onError: () => {
                 ToastTopEnd.fire({
                     icon: "error",
-                    title: "Login Gagal! Silakan cek kembali data Anda.",
+                    title: "Login Failed! Please check your details again.",
                 });
             },
         });

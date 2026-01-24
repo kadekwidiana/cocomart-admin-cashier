@@ -84,13 +84,13 @@ class ImageSliderController extends Controller
 
             $imageSlider = ImageSlider::create($validated);
 
-            return ApiResponse::success($imageSlider, 'Image slider berhasil dibuat.', 201);
+            return ApiResponse::success($imageSlider, 'Image slider successfully created.', 201);
         } catch (Exception $e) {
             return ApiResponse::error(
                 [
                     'detail' => $e->getMessage(),
                 ],
-                'Image slider gagal dibuat.',
+                'Image slider failed to create.',
             );
         }
     }
@@ -134,13 +134,13 @@ class ImageSliderController extends Controller
 
             $imageSlider->update($validated);
 
-            return ApiResponse::success($imageSlider, 'Image slider berhasil diupdate.', 200);
+            return ApiResponse::success($imageSlider, 'Image slider successfully updated.', 200);
         } catch (Exception $e) {
             return ApiResponse::error(
                 [
                     'detail' => $e->getMessage(),
                 ],
-                'Image slider gagal diupdate.',
+                'Image slider failed to update.',
             );
         }
     }
@@ -155,13 +155,13 @@ class ImageSliderController extends Controller
 
             $imageSlider->delete();
 
-            return ApiResponse::success(null, 'Image slider berhasil dihapus.', 200);
+            return ApiResponse::success(null, 'Image slider successfully deleted.', 200);
         } catch (Exception $e) {
             return ApiResponse::error(
                 [
                     'detail' => $e->getMessage(),
                 ],
-                'Image slider gagal dihapus.',
+                'Image slider failed to delete.',
             );
         }
     }

@@ -20,7 +20,7 @@ class ProfileController extends Controller
     public function edit(Request $request): Response
     {
         return Inertia::render('Backpage/Profile/Edit', [
-            'title' => 'Profile Pengguna',
+            'title' => 'User Profile',
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
             'status' => session('status'),
         ]);

@@ -95,13 +95,13 @@ class PromoController extends Controller
 
             $promo = Promo::create($validated);
 
-            return ApiResponse::success($promo, 'Promo berhasil dibuat.', 201);
+            return ApiResponse::success($promo, 'Promo successfully created.', 201);
         } catch (Exception $e) {
             return ApiResponse::error(
                 [
                     'detail' => $e->getMessage(),
                 ],
-                'Promo gagal dibuat.',
+                'Promo failed to create.',
             );
         }
     }
@@ -145,13 +145,13 @@ class PromoController extends Controller
 
             $promo->update($validated);
 
-            return ApiResponse::success($promo, 'Promo berhasil diupdate.', 200);
+            return ApiResponse::success($promo, 'Promo successfully updated.', 200);
         } catch (Exception $e) {
             return ApiResponse::error(
                 [
                     'detail' => $e->getMessage(),
                 ],
-                'Promo gagal diupdate.',
+                'Promo failed to update.',
             );
         }
     }
@@ -166,13 +166,13 @@ class PromoController extends Controller
 
             $promo->delete();
 
-            return ApiResponse::success(null, 'Promo berhasil dihapus.', 200);
+            return ApiResponse::success(null, 'Promo successfully deleted.', 200);
         } catch (Exception $e) {
             return ApiResponse::error(
                 [
                     'detail' => $e->getMessage(),
                 ],
-                'Promo gagal dihapus.',
+                'Promo failed to delete.',
             );
         }
     }

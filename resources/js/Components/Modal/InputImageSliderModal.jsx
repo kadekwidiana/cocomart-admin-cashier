@@ -1,5 +1,5 @@
 import useInputImageSlider from "@/Features/ImageSliders/useInputImageSlider";
-import { formatDateToIndonesian } from "@/Utils/formatDateToIndonesian";
+import { formatDateToEnglish } from "@/Utils/formatDateToEnglish";
 import { Button, Label, Modal, Select, TextInput } from "flowbite-react";
 import { useState } from "react";
 
@@ -28,7 +28,7 @@ export function InputImageSliderModal({
             </div>
             <Modal show={openModal} onClose={() => setOpenModal(false)}>
                 <Modal.Header>
-                    {isUpdate ? "Detail Image Slider" : "Tambah Image Slider"}
+                    {isUpdate ? "Detail Image Slider" : "Add Image Slider"}
                 </Modal.Header>
                 <Modal.Body>
                     <form
@@ -50,7 +50,7 @@ export function InputImageSliderModal({
                             <div className="mb-2 block">
                                 <Label
                                     htmlFor="image"
-                                    value="Gambar"
+                                    value="Image*"
                                     color={errors.image ? "failure" : "gray"}
                                 />
                             </div>
@@ -76,7 +76,7 @@ export function InputImageSliderModal({
                                 id="link"
                                 name="link"
                                 type="text"
-                                placeholder="Masukan link..."
+                                placeholder="Enter link..."
                                 value={formData.link}
                                 onChange={handleChange}
                                 color={errors.link ? "failure" : "gray"}
@@ -99,7 +99,7 @@ export function InputImageSliderModal({
                                     id="index"
                                     name="index"
                                     type="text"
-                                    placeholder="Masukan index..."
+                                    placeholder="Enter index..."
                                     value={formData.index}
                                     onChange={handleChange}
                                     color={errors.index ? "failure" : "gray"}
@@ -128,8 +128,8 @@ export function InputImageSliderModal({
                                     helperText={errors.is_active}
                                     defaultValue={formData.is_active}
                                 >
-                                    <option value="1">Aktif</option>
-                                    <option value="0">Tidak Aktif</option>
+                                    <option value="1">Active</option>
+                                    <option value="0">Inactive</option>
                                 </Select>
                             </div>
                         </div>
@@ -140,14 +140,14 @@ export function InputImageSliderModal({
                                     <div className="mb-2 block">
                                         <Label
                                             htmlFor="created_at"
-                                            value="Dibuat"
+                                            value="Created At"
                                         />
                                     </div>
                                     <TextInput
                                         id="created_at"
                                         name="created_at"
                                         type="text"
-                                        value={formatDateToIndonesian(
+                                        value={formatDateToEnglish(
                                             data.created_at ?? "",
                                         )}
                                         readOnly
@@ -157,14 +157,14 @@ export function InputImageSliderModal({
                                     <div className="mb-2 block">
                                         <Label
                                             htmlFor="updated_at"
-                                            value="Diupdate"
+                                            value="Updated At"
                                         />
                                     </div>
                                     <TextInput
                                         id="updated_at"
                                         name="updated_at"
                                         type="text"
-                                        value={formatDateToIndonesian(
+                                        value={formatDateToEnglish(
                                             data.updated_at ?? "",
                                         )}
                                         readOnly
@@ -178,7 +178,7 @@ export function InputImageSliderModal({
                                 color="none"
                                 className="border-primary/100 border hover:bg-primary/10 text-primary/100 text-nowrap"
                             >
-                                Kembali
+                                Cancel
                             </Button>
                             {!isReadOnly && (
                                 <Button
@@ -187,7 +187,7 @@ export function InputImageSliderModal({
                                     color="none"
                                     className="bg-primary/80 hover:bg-primary text-white text-nowrap"
                                 >
-                                    {isUpdate ? "Update" : "Simpan"}
+                                    {isUpdate ? "Update" : "Save"}
                                 </Button>
                             )}
                         </div>

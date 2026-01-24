@@ -38,7 +38,7 @@ export default function useUpdateProfile() {
             onSuccess: () => {
                 ToastTopEnd.fire({
                     icon: "success",
-                    title: "Profil anda berhasil diupdate.",
+                    title: "Your profile has been successfully updated.",
                 });
             },
         });

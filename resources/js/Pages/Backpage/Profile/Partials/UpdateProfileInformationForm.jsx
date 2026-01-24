@@ -19,11 +19,11 @@ export default function UpdateProfileInformationForm({
         <section className={className}>
             <header>
                 <h2 className="text-lg font-semibold text-gray-900">
-                    Informasi Profil
+                    Profile Information
                 </h2>
                 <p className="mt-1 text-sm text-gray-600">
-                    Perbarui informasi profil Anda, pastikan semua data sudah
-                    benar sebelum menyimpannya.
+                    Update your profile information and make sure all details
+                    are correct before saving.
                 </p>
             </header>
 
@@ -32,11 +32,11 @@ export default function UpdateProfileInformationForm({
                 className="mt-4 space-y-2"
                 encType="multipart/form-data"
             >
-                <div className="">
+                <div>
                     <div className="mb-2 block">
                         <Label
                             htmlFor="name"
-                            value="Nama*"
+                            value="Name*"
                             color={errors.name ? "failure" : "gray"}
                         />
                     </div>
@@ -44,16 +44,16 @@ export default function UpdateProfileInformationForm({
                         id="name"
                         name="name"
                         type="text"
-                        placeholder="Masukan nama..."
+                        placeholder="Enter your name..."
                         required
                         value={data.name}
-                        // isFocused={true}
                         color={errors.name ? "failure" : "gray"}
                         onChange={handleChange}
                         helperText={errors.name}
                     />
                 </div>
-                <div className="">
+
+                <div>
                     <div className="mb-2 block">
                         <Label
                             htmlFor="email"
@@ -65,17 +65,17 @@ export default function UpdateProfileInformationForm({
                         id="email"
                         name="email"
                         type="text"
-                        placeholder="Masukan email..."
+                        placeholder="Enter your email..."
                         required
                         value={data.email}
-                        // isFocused={true}
                         color={errors.email ? "failure" : "gray"}
                         onChange={handleChange}
                         helperText={errors.email}
                         readOnly
                     />
                 </div>
-                <div className="">
+
+                <div>
                     <div className="mb-2 block">
                         <Label
                             htmlFor="role"
@@ -87,11 +87,10 @@ export default function UpdateProfileInformationForm({
                         id="role"
                         name="role"
                         type="text"
-                        placeholder="Masukan role..."
+                        placeholder="Role"
                         required
                         readOnly
                         value={data.role}
-                        // isFocused={true}
                         color={errors.role ? "failure" : "gray"}
                         onChange={handleChange}
                         helperText={errors.role}
@@ -105,7 +104,7 @@ export default function UpdateProfileInformationForm({
                         color="none"
                         className="bg-primary/80 hover:bg-primary/100 text-white"
                     >
-                        Simpan
+                        Save
                     </Button>
                 </div>
             </form>

@@ -6,9 +6,8 @@ import { PER_PAGES } from "@/Constants/dataOptions";
 import useDeletePromo from "@/Features/Promos/useDeletePromo";
 import useGetPromos from "@/Features/Promos/useGetPromos";
 import BackpageLayout from "@/Layouts/BackpageLayout";
-import { formatDateToIndonesian } from "@/Utils/formatDateToIndonesian";
+import { formatDateToEnglish } from "@/Utils/formatDateToEnglish";
 import { Link } from "@inertiajs/react";
-import { format } from "date-fns";
 import { Button, Label, Select, Table, TextInput } from "flowbite-react";
 import { FaInfoCircle, FaTrash } from "react-icons/fa";
 
@@ -113,7 +112,7 @@ export default function PromoPage() {
                         type="button"
                         className="bg-green-700/80 hover:bg-green-700/100 text-white text-nowrap w-fit"
                     >
-                        Cari
+                        Find
                     </Button>
                     <Link href="/promos">
                         <Button
@@ -132,7 +131,7 @@ export default function PromoPage() {
                                 type="button"
                                 className="bg-primary/80 hover:bg-primary/100 text-white text-nowrap w-fit"
                             >
-                                Tambah Data
+                                Add Data
                             </Button>
                         }
                     />
@@ -149,7 +148,7 @@ export default function PromoPage() {
                         <Table.HeadCell>Start Date</Table.HeadCell>
                         <Table.HeadCell>End Date</Table.HeadCell>
                         <Table.HeadCell className="flex items-center justify-center">
-                            Aksi
+                            Actions
                         </Table.HeadCell>
                     </Table.Head>
                     <Table.Body className="divide-y">
@@ -176,12 +175,12 @@ export default function PromoPage() {
                                             : "Tidak Aktif"}
                                     </Table.Cell>
                                     <Table.Cell>
-                                        {formatDateToIndonesian(
+                                        {formatDateToEnglish(
                                             promo.start_date ?? "",
                                         )}
                                     </Table.Cell>
                                     <Table.Cell>
-                                        {formatDateToIndonesian(
+                                        {formatDateToEnglish(
                                             promo.end_date ?? "",
                                         )}
                                     </Table.Cell>

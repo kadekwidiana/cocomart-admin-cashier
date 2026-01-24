@@ -4,10 +4,10 @@
  * @param {boolean} isDisplayTime - Menentukan apakah jam harus ditampilkan atau tidak
  * @returns {string} Tanggal yang telah diformat dalam format "dd MMMM yyyy" dan opsional jam dalam format "HH:mm:ss"
  */
-export function formatDateToIndonesian(dateInput, isDisplayTime = false) {
+export function formatDateToEnglish(dateInput, isDisplayTime = false) {
     const monthNames = [
-        "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-        "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
     ];
 
     // Jika dateInput adalah string, pastikan parsing dalam zona waktu lokal

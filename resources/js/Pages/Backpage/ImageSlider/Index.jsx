@@ -84,7 +84,7 @@ export default function ImageSliderPage() {
                         type="button"
                         className="bg-green-700/80 hover:bg-green-700/100 text-white text-nowrap w-fit"
                     >
-                        Cari
+                        Find
                     </Button>
                     <Link href="/image-sliders">
                         <Button
@@ -103,7 +103,7 @@ export default function ImageSliderPage() {
                                 type="button"
                                 className="bg-primary/80 hover:bg-primary/100 text-white text-nowrap w-fit"
                             >
-                                Tambah Data
+                                Add Data
                             </Button>
                         }
                     />
@@ -118,7 +118,7 @@ export default function ImageSliderPage() {
                         <Table.HeadCell>Index</Table.HeadCell>
                         <Table.HeadCell>Status</Table.HeadCell>
                         <Table.HeadCell className="flex items-center justify-center">
-                            Aksi
+                            Actions
                         </Table.HeadCell>
                     </Table.Head>
                     <Table.Body className="divide-y">
@@ -146,8 +146,8 @@ export default function ImageSliderPage() {
                                     </Table.Cell>
                                     <Table.Cell>
                                         {imageSlider.is_active
-                                            ? "Aktif"
-                                            : "Tidak Aktif"}
+                                            ? "Active"
+                                            : "Inactive"}
                                     </Table.Cell>
                                     <Table.Cell className="flex items-center justify-center gap-2">
                                         <InputImageSliderModal

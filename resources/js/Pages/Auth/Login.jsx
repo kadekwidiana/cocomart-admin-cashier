@@ -12,6 +12,7 @@ export default function Login() {
             <Head>
                 <title>Login</title>
             </Head>
+
             <div className="flex h-screen w-screen items-center justify-center px-4">
                 <div className="flex w-full flex-col items-center justify-center gap-4">
                     <form
@@ -27,16 +28,16 @@ export default function Login() {
                                 />
                             </Link>
                             <h2 className="text-center text-2xl/9 font-bold tracking-tight text-gray-900">
-                                Login ke akun Anda
+                                Log in to your account
                             </h2>
                         </div>
+
                         {errors.email && (
                             <div className="flex justify-center">
-                                <InputError
-                                    message={"Email atau password salah!"}
-                                />
+                                <InputError message="Invalid email or password!" />
                             </div>
                         )}
+
                         <div>
                             <div className="mb-2 block">
                                 <Label htmlFor="email" value="Email" />
@@ -45,15 +46,15 @@ export default function Login() {
                                 id="email"
                                 name="email"
                                 type="email"
-                                placeholder="Masukan email..."
+                                placeholder="Enter your email..."
                                 required
                                 value={data.email}
-                                // isFocused={true}
                                 onChange={(e) =>
                                     setData("email", e.target.value)
                                 }
                             />
                         </div>
+
                         <div>
                             <div className="mb-2 block">
                                 <Label htmlFor="password" value="Password" />
@@ -62,7 +63,7 @@ export default function Login() {
                                 id="password"
                                 name="password"
                                 type="password"
-                                placeholder="Masukan password..."
+                                placeholder="Enter your password..."
                                 required
                                 value={data.password}
                                 autoComplete="current-password"
@@ -71,6 +72,7 @@ export default function Login() {
                                 }
                             />
                         </div>
+
                         <div className="flex items-center gap-2">
                             <Checkbox
                                 id="remember"
@@ -79,8 +81,9 @@ export default function Login() {
                                     setData("remember", e.target.checked)
                                 }
                             />
-                            <Label htmlFor="remember">Ingat Saya</Label>
+                            <Label htmlFor="remember">Remember me</Label>
                         </div>
+
                         <Button
                             type="submit"
                             disabled={processing}

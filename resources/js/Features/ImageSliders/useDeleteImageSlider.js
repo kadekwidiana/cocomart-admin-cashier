@@ -44,13 +44,13 @@ export default function useDeleteImageSlider() {
 
     const deleteDataConfirm = (id) => {
         Swal.fire({
-            title: "Apakah Anda yakin ingin menghapus data ini?",
-            text: "Data yang terkait dengan ini juga akan dihapus dan tidak dapat dipulihkan.",
+            title: "Are you sure you want to delete this data?",
+            text: "Any related data will also be deleted and cannot be recovered.",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
             cancelButtonColor: "#d33",
-            confirmButtonText: "Ya",
+            confirmButtonText: "Yes",
         }).then(async (result) => {
             if (result.isConfirmed) {
                 await handleDelete(id);

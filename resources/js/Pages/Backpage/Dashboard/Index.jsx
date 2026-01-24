@@ -14,11 +14,11 @@ export default function DashboardPage() {
                     <FaCircleCheck className="size-10 text-primary/70" />
                     <div className="w-full">
                         <h5 className="mb-1 text-lg text-black">
-                            Selamat datang,{" "}
+                            Welcome,{" "}
                             <span className="font-semibold">
                                 {auth.user.name}
                             </span>
-                            . Anda login sebagai{" "}
+                            . You are logged in as{" "}
                             <span className="font-semibold">
                                 {auth.user.role === "ADMIN"
                                     ? "ADMIN"
@@ -27,8 +27,8 @@ export default function DashboardPage() {
                             .
                         </h5>
                         <p className="text-body text-base leading-relaxed">
-                            Pastikan untuk menjaga kerahasiaan Email dan
-                            Password Anda.
+                            Please make sure to keep your email and password
+                            confidential.
                         </p>
                     </div>
                     <Banner.CollapseButton
