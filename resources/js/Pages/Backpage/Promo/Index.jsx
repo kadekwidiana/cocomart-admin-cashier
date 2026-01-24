@@ -79,7 +79,7 @@ export default function PromoPage() {
                 </div>
                 <div>
                     <div className="mb-2 block">
-                        <Label htmlFor="start_date" value="Code" />
+                        <Label htmlFor="start_date" value="Start Date" />
                     </div>
                     <TextInput
                         id="start_date"
@@ -93,7 +93,7 @@ export default function PromoPage() {
                 </div>
                 <div>
                     <div className="mb-2 block">
-                        <Label htmlFor="end_date" value="Code" />
+                        <Label htmlFor="end_date" value="End Date" />
                     </div>
                     <TextInput
                         id="end_date"
