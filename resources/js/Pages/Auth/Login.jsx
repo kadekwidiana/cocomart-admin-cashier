@@ -88,7 +88,7 @@ export default function Login() {
                             type="submit"
                             disabled={processing}
                             color="none"
-                            className="bg-primary/80 hover:bg-primary/100 text-white"
+                            className="bg-primary hover:bg-yellow-500/100 text-white"
                         >
                             Login
                         </Button>

@@ -41,7 +41,7 @@ export default function ErrorPage({ status }) {
                 <a href="/" className="flex w-full items-center justify-center">
                     <Button
                         color="none"
-                        className="bg-primary/80 hover:bg-primary/100 text-white"
+                        className="bg-primary hover:bg-yellow-500/100 text-white"
                     >
                         <FaHome className="mr-2 h-5 w-5" />
                         Kembali

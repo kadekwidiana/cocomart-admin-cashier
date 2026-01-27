@@ -185,7 +185,7 @@ export function InputImageSliderModal({
                                     type="submit"
                                     disabled={isSubmitting}
                                     color="none"
-                                    className="bg-primary/80 hover:bg-primary text-white text-nowrap"
+                                    className="bg-primary hover:bg-yellow-500 text-white text-nowrap"
                                 >
                                     {isUpdate ? "Update" : "Save"}
                                 </Button>

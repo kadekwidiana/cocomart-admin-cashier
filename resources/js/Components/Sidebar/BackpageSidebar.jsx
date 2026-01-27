@@ -4,6 +4,7 @@ import { HiOutlineChartPie } from "react-icons/hi";
 import { TfiLayoutSliderAlt } from "react-icons/tfi";
 import { RiDiscountPercentLine } from "react-icons/ri";
 import { MdOutlineNotificationsActive } from "react-icons/md";
+import { BiCategory } from "react-icons/bi";
 
 export default function BackpageSidebar({ isVisible }) {
     const { auth } = usePage().props;
@@ -41,6 +42,11 @@ export default function BackpageSidebar({ isVisible }) {
                             href="/notifications"
                             label="Notification"
                             icon={MdOutlineNotificationsActive}
+                        />
+                        <SidebarMenu
+                            href="/categories"
+                            label="Category"
+                            icon={BiCategory}
                         />
                     </Sidebar.ItemGroup>
                 </Sidebar.Items>

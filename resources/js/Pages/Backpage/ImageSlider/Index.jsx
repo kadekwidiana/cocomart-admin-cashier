@@ -101,7 +101,7 @@ export default function ImageSliderPage() {
                             <Button
                                 color="none"
                                 type="button"
-                                className="bg-primary/80 hover:bg-primary/100 text-white text-nowrap w-fit"
+                                className="bg-primary hover:bg-yellow-500/100 text-white text-nowrap w-fit"
                             >
                                 Add Data
                             </Button>

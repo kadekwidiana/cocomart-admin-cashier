@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ImageSliderController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
@@ -41,6 +42,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // notification
     Route::resource('notifications', NotificationController::class);
     Route::post('notifications/{id}/update', [NotificationController::class, 'update'])->name('notifications.update');
+
+    // category
+    Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
+    Route::get('categories/{code}', [CategoryController::class, 'show'])->name('categories.show');
+    Route::post('categories/image/add/{oxyCategoryId}', [CategoryController::class, 'addImage'])->name('categories.addImage');
+    Route::delete('categories/image/delete/{id}', [CategoryController::class, 'deleteImage'])->name('categories.deleteImage');
 });
 
 require __DIR__ . '/auth.php';
@@ -48,7 +55,7 @@ require __DIR__ . '/auth.php';
 
 // storage link dan cronjob tidak bisa, jadi pake cara ini
 Route::get('/storage/{folder}/{filename}', function ($folder, $filename) {
-    $allowedFolders = ['image-sliders', 'promos', 'notifications'];
+    $allowedFolders = ['image-sliders', 'promos', 'notifications', 'categories'];
 
     if (!in_array($folder, $allowedFolders)) {
         abort(404);

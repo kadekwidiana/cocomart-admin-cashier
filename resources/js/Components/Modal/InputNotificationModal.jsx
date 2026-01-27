@@ -34,11 +34,7 @@ export function InputNotificationModal({
             <div className="cursor-pointer" onClick={() => setOpenModal(true)}>
                 {trigger}
             </div>
-            <Modal
-                show={openModal}
-                onClose={() => setOpenModal(false)}
-                size="5xl"
-            >
+            <Modal show={openModal} onClose={() => setOpenModal(false)}>
                 <Modal.Header>
                     {isUpdate ? "Detail Notification" : "Add Notification"}
                 </Modal.Header>
@@ -47,6 +43,34 @@ export function InputNotificationModal({
                         onSubmit={handleSubmit}
                         className="flex w-full flex-col gap-3"
                     >
+                        <div>
+                            {imagePreview.image && (
+                                <div className="mt-2">
+                                    <img
+                                        src={imagePreview.image}
+                                        alt="Preview"
+                                        className="w-1/2 rounded-lg object-cover"
+                                    />
+                                </div>
+                            )}
+                        </div>
+                        <div>
+                            <div className="mb-2 block">
+                                <Label
+                                    htmlFor="image"
+                                    value="Image*"
+                                    color={errors.image ? "failure" : "gray"}
+                                />
+                            </div>
+                            <TextInput
+                                id="image"
+                                name="image"
+                                type="file"
+                                onChange={handleFileChange}
+                                color={errors.image ? "failure" : "gray"}
+                                helperText={errors.image}
+                            />
+                        </div>
                         <div>
                             <div className="mb-2 block">
                                 <Label
@@ -88,35 +112,6 @@ export function InputNotificationModal({
                                     </option>
                                 ))}
                             </Select>
-                        </div>
-
-                        <div>
-                            {imagePreview.image && (
-                                <div className="mt-2">
-                                    <img
-                                        src={imagePreview.image}
-                                        alt="Preview"
-                                        className="w-1/2 rounded-lg object-cover"
-                                    />
-                                </div>
-                            )}
-                        </div>
-                        <div>
-                            <div className="mb-2 block">
-                                <Label
-                                    htmlFor="image"
-                                    value="Image*"
-                                    color={errors.image ? "failure" : "gray"}
-                                />
-                            </div>
-                            <TextInput
-                                id="image"
-                                name="image"
-                                type="file"
-                                onChange={handleFileChange}
-                                color={errors.image ? "failure" : "gray"}
-                                helperText={errors.image}
-                            />
                         </div>
 
                         <div>
@@ -189,7 +184,7 @@ export function InputNotificationModal({
                                     type="submit"
                                     disabled={isSubmitting}
                                     color="none"
-                                    className="bg-primary/80 hover:bg-primary text-white text-nowrap"
+                                    className="bg-primary hover:bg-yellow-500 text-white text-nowrap"
                                 >
                                     {isUpdate ? "Update" : "Save"}
                                 </Button>
