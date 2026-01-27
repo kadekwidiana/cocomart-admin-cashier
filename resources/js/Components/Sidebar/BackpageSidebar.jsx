@@ -3,6 +3,7 @@ import { Sidebar } from "flowbite-react";
 import { HiOutlineChartPie } from "react-icons/hi";
 import { TfiLayoutSliderAlt } from "react-icons/tfi";
 import { RiDiscountPercentLine } from "react-icons/ri";
+import { MdOutlineNotificationsActive } from "react-icons/md";
 
 export default function BackpageSidebar({ isVisible }) {
     const { auth } = usePage().props;
@@ -35,6 +36,11 @@ export default function BackpageSidebar({ isVisible }) {
                             href="/promos"
                             label="Promo"
                             icon={RiDiscountPercentLine}
+                        />
+                        <SidebarMenu
+                            href="/notifications"
+                            label="Notification"
+                            icon={MdOutlineNotificationsActive}
                         />
                     </Sidebar.ItemGroup>
                 </Sidebar.Items>

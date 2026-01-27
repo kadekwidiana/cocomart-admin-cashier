@@ -72,9 +72,9 @@ export default function ImageSliderPage() {
                             handleChange("is_active", e.target.value)
                         }
                     >
-                        <option value="">Semua</option>
-                        <option value="1">Aktif</option>
-                        <option value="0">Tidak Aktif</option>
+                        <option value="">All</option>
+                        <option value="1">Active</option>
+                        <option value="0">Inactive</option>
                     </Select>
                 </div>
                 <div className="flex gap-2">

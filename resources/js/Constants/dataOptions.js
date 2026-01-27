@@ -13,3 +13,12 @@ export const GENDERS = [
     { value: "MAN", label: "Laki-Laki" },
     { value: "WOMAN", label: "Perempuan" }
 ];
+
+export const NOTIFICATION_TYPES = [
+    'INFO',
+    'SUCCESS',
+    'WARNING',
+    'ERROR',
+    'SYSTEM',
+    'PROMOTION',
+];

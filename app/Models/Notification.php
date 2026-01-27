@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\NotificationType;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -18,6 +19,10 @@ class Notification extends Model
         'image',
         'body',
         'type',
+    ];
+
+    protected $casts = [
+        'type' => NotificationType::class,
     ];
 
     public function notificationReadOne()

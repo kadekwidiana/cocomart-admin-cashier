@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ImageSliderController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromoController;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +37,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // promo
     Route::resource('promos', PromoController::class);
     Route::post('promos/{id}/update', [PromoController::class, 'update'])->name('promos.update');
+
+    // notification
+    Route::resource('notifications', NotificationController::class);
+    Route::post('notifications/{id}/update', [NotificationController::class, 'update'])->name('notifications.update');
 });
 
 require __DIR__ . '/auth.php';
@@ -43,7 +48,7 @@ require __DIR__ . '/auth.php';
 
 // storage link dan cronjob tidak bisa, jadi pake cara ini
 Route::get('/storage/{folder}/{filename}', function ($folder, $filename) {
-    $allowedFolders = ['image-sliders', 'promos'];
+    $allowedFolders = ['image-sliders', 'promos', 'notifications'];
 
     if (!in_array($folder, $allowedFolders)) {
         abort(404);

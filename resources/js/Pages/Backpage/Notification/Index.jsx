@@ -1,20 +1,20 @@
 import DataNotFoundError from "@/Components/Error/DataNotFoundError";
 import DataLoading from "@/Components/Loading/DataLoading";
-import { InputPromoModal } from "@/Components/Modal/InputPromoModal";
+import { InputNotificationModal } from "@/Components/Modal/InputNotificationModal";
 import ListDataPagination from "@/Components/Pagination/ListDataPagination";
-import { PER_PAGES } from "@/Constants/dataOptions";
-import useDeletePromo from "@/Features/Promos/useDeletePromo";
-import useGetPromos from "@/Features/Promos/useGetPromos";
+import { NOTIFICATION_TYPES, PER_PAGES } from "@/Constants/dataOptions";
+import useDeleteNotification from "@/Features/Notifications/useDeletePromo";
+import useGetNotifications from "@/Features/Notifications/useGetPromos";
 import BackpageLayout from "@/Layouts/BackpageLayout";
-import { formatDateToEnglish } from "@/Utils/formatDateToEnglish";
 import { Link } from "@inertiajs/react";
 import { Button, Label, Select, Table, TextInput } from "flowbite-react";
 import { FaInfoCircle, FaTrash } from "react-icons/fa";
 
-export default function PromoPage() {
-    const { promos, isLoading, params, handleChange, getData } = useGetPromos();
+export default function NotificationPage() {
+    const { notifications, isLoading, params, handleChange, getData } =
+        useGetNotifications();
 
-    const { deleteDataConfirm } = useDeletePromo();
+    const { deleteDataConfirm } = useDeleteNotification();
 
     return (
         <BackpageLayout>
@@ -51,59 +51,21 @@ export default function PromoPage() {
                 </div>
                 <div>
                     <div className="mb-2 block">
-                        <Label htmlFor="code" value="Code" />
-                    </div>
-                    <TextInput
-                        id="code"
-                        type="search"
-                        placeholder="Search by code..."
-                        value={params.code}
-                        onChange={(e) => handleChange("code", e.target.value)}
-                    />
-                </div>
-                <div>
-                    <div className="mb-2 block">
-                        <Label htmlFor="is_active" value="Status" />
+                        <Label htmlFor="type" value="Type" />
                     </div>
                     <Select
-                        id="is_active"
-                        value={params.is_active}
-                        onChange={(e) =>
-                            handleChange("is_active", e.target.value)
-                        }
+                        id="type"
+                        name="type"
+                        value={params.type}
+                        onChange={(e) => handleChange("type", e.target.value)}
                     >
                         <option value="">All</option>
-                        <option value="1">Active</option>
-                        <option value="0">Inactive</option>
+                        {NOTIFICATION_TYPES.map((type) => (
+                            <option key={type} value={type}>
+                                {type}
+                            </option>
+                        ))}
                     </Select>
-                </div>
-                <div>
-                    <div className="mb-2 block">
-                        <Label htmlFor="start_date" value="Start Date" />
-                    </div>
-                    <TextInput
-                        id="start_date"
-                        type="date"
-                        placeholder="Search by start_date..."
-                        value={params.start_date}
-                        onChange={(e) =>
-                            handleChange("start_date", e.target.value)
-                        }
-                    />
-                </div>
-                <div>
-                    <div className="mb-2 block">
-                        <Label htmlFor="end_date" value="End Date" />
-                    </div>
-                    <TextInput
-                        id="end_date"
-                        type="date"
-                        placeholder="Search by end_date..."
-                        value={params.end_date}
-                        onChange={(e) =>
-                            handleChange("end_date", e.target.value)
-                        }
-                    />
                 </div>
                 <div className="flex gap-2">
                     <Button
@@ -114,7 +76,7 @@ export default function PromoPage() {
                     >
                         Find
                     </Button>
-                    <Link href="/promos">
+                    <Link href="/notifications">
                         <Button
                             color="none"
                             type="button"
@@ -124,7 +86,7 @@ export default function PromoPage() {
                         </Button>
                     </Link>
 
-                    <InputPromoModal
+                    <InputNotificationModal
                         trigger={
                             <Button
                                 color="none"
@@ -142,59 +104,48 @@ export default function PromoPage() {
                     <Table.Head>
                         <Table.HeadCell className="w-5">#</Table.HeadCell>
                         <Table.HeadCell>Title</Table.HeadCell>
-                        <Table.HeadCell>Code</Table.HeadCell>
-                        <Table.HeadCell>Discount</Table.HeadCell>
-                        <Table.HeadCell>Status</Table.HeadCell>
-                        <Table.HeadCell>Start Date</Table.HeadCell>
-                        <Table.HeadCell>End Date</Table.HeadCell>
+                        <Table.HeadCell>Type</Table.HeadCell>
+                        <Table.HeadCell>Image</Table.HeadCell>
                         <Table.HeadCell className="flex items-center justify-center">
                             Actions
                         </Table.HeadCell>
                     </Table.Head>
                     <Table.Body className="divide-y">
                         {!isLoading &&
-                            promos.data.map((promo, index) => (
+                            notifications.data.map((notification, index) => (
                                 <Table.Row key={index} className="bg-white">
                                     <Table.Cell className="w-5 whitespace-nowrap font-medium text-gray-900">
-                                        {(promos.current_page - 1) *
-                                            promos.per_page +
+                                        {(notifications.current_page - 1) *
+                                            notifications.per_page +
                                             index +
                                             1}
                                     </Table.Cell>
                                     <Table.Cell className="whitespace-nowrap font-medium text-gray-900">
-                                        {promo.title ?? "-"}
-                                    </Table.Cell>
-                                    <Table.Cell>{promo.code ?? "-"}</Table.Cell>
-                                    <Table.Cell>
-                                        {`${promo.discount_percentage} %` ??
-                                            "-"}
+                                        {notification.title ?? "-"}
                                     </Table.Cell>
                                     <Table.Cell>
-                                        {promo.is_active
-                                            ? "Aktif"
-                                            : "Tidak Aktif"}
+                                        {notification.type ?? "-"}
                                     </Table.Cell>
                                     <Table.Cell>
-                                        {formatDateToEnglish(
-                                            promo.start_date ?? "",
-                                        )}
-                                    </Table.Cell>
-                                    <Table.Cell>
-                                        {formatDateToEnglish(
-                                            promo.end_date ?? "",
-                                        )}
+                                        <img
+                                            src={notification.image}
+                                            alt="Image"
+                                            className="w-28 rounded-lg object-cover"
+                                        />
                                     </Table.Cell>
                                     <Table.Cell className="flex items-center justify-center gap-2">
-                                        <InputPromoModal
+                                        <InputNotificationModal
                                             trigger={
                                                 <FaInfoCircle className="size-6 text-blue-500" />
                                             }
                                             isUpdate={true}
-                                            data={promo}
+                                            data={notification}
                                         />
                                         <button
                                             onClick={() =>
-                                                deleteDataConfirm(promo.id)
+                                                deleteDataConfirm(
+                                                    notification.id,
+                                                )
                                             }
                                         >
                                             <FaTrash className="size-5 text-red-500" />
@@ -205,10 +156,12 @@ export default function PromoPage() {
                     </Table.Body>
                 </Table>
                 {isLoading && <DataLoading />}
-                {promos.data.length <= 0 && !isLoading && <DataNotFoundError />}
+                {notifications.data.length <= 0 && !isLoading && (
+                    <DataNotFoundError />
+                )}
             </div>
-            {promos.data.length > 0 && !isLoading && (
-                <ListDataPagination data={promos} params={params} />
+            {notifications.data.length > 0 && !isLoading && (
+                <ListDataPagination data={notifications} params={params} />
             )}
         </BackpageLayout>
     );
