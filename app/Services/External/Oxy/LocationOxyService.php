@@ -6,7 +6,7 @@ use App\Helpers\ErrorHandler;
 use Exception;
 use Illuminate\Support\Facades\Http;
 
-class StoreOxyService
+class LocationOxyService
 {
     public static function getLocations(
         string $token,

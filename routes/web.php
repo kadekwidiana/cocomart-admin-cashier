@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ImageSliderController;
+use App\Http\Controllers\LocationController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromoController;
@@ -48,6 +49,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('categories/{code}', [CategoryController::class, 'show'])->name('categories.show');
     Route::post('categories/image/add/{oxyCategoryId}', [CategoryController::class, 'addImage'])->name('categories.addImage');
     Route::delete('categories/image/delete/{id}', [CategoryController::class, 'deleteImage'])->name('categories.deleteImage');
+
+    // location
+    Route::get('locations', [LocationController::class, 'index'])->name('locations.index');
+    Route::get('locations/{code}', [LocationController::class, 'show'])->name('locations.show');
+    Route::post('locations/image/add/{oxyLocationId}', [LocationController::class, 'addImage'])->name('locations.addImage');
+    Route::delete('locations/image/delete/{id}', [LocationController::class, 'deleteImage'])->name('locations.deleteImage');
 });
 
 require __DIR__ . '/auth.php';
@@ -55,7 +62,7 @@ require __DIR__ . '/auth.php';
 
 // storage link dan cronjob tidak bisa, jadi pake cara ini
 Route::get('/storage/{folder}/{filename}', function ($folder, $filename) {
-    $allowedFolders = ['image-sliders', 'promos', 'notifications', 'categories'];
+    $allowedFolders = ['image-sliders', 'promos', 'notifications', 'categories', 'locations'];
 
     if (!in_array($folder, $allowedFolders)) {
         abort(404);

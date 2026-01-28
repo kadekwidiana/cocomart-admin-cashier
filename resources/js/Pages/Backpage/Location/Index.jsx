@@ -1,38 +1,18 @@
 import DataNotFoundError from "@/Components/Error/DataNotFoundError";
 import DataLoading from "@/Components/Loading/DataLoading";
-import ListDataPagination from "@/Components/Pagination/ListDataPagination";
-import { PER_PAGES } from "@/Constants/dataOptions";
-import useGetCatagories from "@/Features/Categories/useGetCategories";
+import useGetLocations from "@/Features/Locations/useGetLocations";
 import BackpageLayout from "@/Layouts/BackpageLayout";
 import { Link } from "@inertiajs/react";
-import { Button, Label, Select, Table, TextInput } from "flowbite-react";
+import { Button, Label, Table, TextInput } from "flowbite-react";
 import { FaInfoCircle } from "react-icons/fa";
 
-export default function CategoryPage() {
-    const { categories, isLoading, params, handleChange, getData } =
-        useGetCatagories();
+export default function LocationPage() {
+    const { locations, isLoading, params, handleChange, getData } =
+        useGetLocations();
 
     return (
         <BackpageLayout>
             <div className="w-full grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6 items-end">
-                <div>
-                    <div className="mb-2 block">
-                        <Label htmlFor="perpage" value="Perpage" />
-                    </div>
-                    <Select
-                        id="perpage"
-                        value={params.perpage}
-                        onChange={(e) =>
-                            handleChange("perpage", e.target.value)
-                        }
-                    >
-                        {PER_PAGES.map((perpage) => (
-                            <option key={perpage} value={perpage}>
-                                {perpage}
-                            </option>
-                        ))}
-                    </Select>
-                </div>
                 <div>
                     <div className="mb-2 block">
                         <Label htmlFor="name" value="Name" />
@@ -66,7 +46,7 @@ export default function CategoryPage() {
                     >
                         Find
                     </Button>
-                    <Link href="/categories">
+                    <Link href="/locations">
                         <Button
                             color="none"
                             type="button"
@@ -83,29 +63,34 @@ export default function CategoryPage() {
                         <Table.HeadCell className="w-5">#</Table.HeadCell>
                         <Table.HeadCell>Name</Table.HeadCell>
                         <Table.HeadCell>Code</Table.HeadCell>
+                        <Table.HeadCell>Type</Table.HeadCell>
+                        <Table.HeadCell>Address Street</Table.HeadCell>
                         <Table.HeadCell className="flex items-center justify-center">
                             Actions
                         </Table.HeadCell>
                     </Table.Head>
                     <Table.Body className="divide-y">
                         {!isLoading &&
-                            categories.data.map((category, index) => (
+                            locations.map((location, index) => (
                                 <Table.Row key={index} className="bg-white">
                                     <Table.Cell className="w-5 whitespace-nowrap font-medium text-gray-900">
-                                        {(categories.current_page - 1) *
-                                            categories.per_page +
-                                            index +
-                                            1}
+                                        {index + 1}
                                     </Table.Cell>
                                     <Table.Cell className="whitespace-nowrap font-medium text-gray-900">
-                                        {category.name ?? "-"}
+                                        {location.name ?? "-"}
                                     </Table.Cell>
                                     <Table.Cell>
-                                        {category.code ?? "-"}
+                                        {location.code ?? "-"}
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        {location.type ?? "-"}
+                                    </Table.Cell>
+                                    <Table.Cell>
+                                        {location.addressStreet || "-"}
                                     </Table.Cell>
                                     <Table.Cell className="flex items-center justify-center gap-2">
                                         <Link
-                                            href={`/categories/${category.code}`}
+                                            href={`/locations/${location.code}`}
                                         >
                                             <FaInfoCircle className="size-6 text-blue-500" />
                                         </Link>
@@ -115,13 +100,8 @@ export default function CategoryPage() {
                     </Table.Body>
                 </Table>
                 {isLoading && <DataLoading />}
-                {categories.data.length <= 0 && !isLoading && (
-                    <DataNotFoundError />
-                )}
+                {locations.length <= 0 && !isLoading && <DataNotFoundError />}
             </div>
-            {categories.data.length > 0 && !isLoading && (
-                <ListDataPagination data={categories} params={params} />
-            )}
         </BackpageLayout>
     );
 }

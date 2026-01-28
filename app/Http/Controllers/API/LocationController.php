@@ -9,7 +9,7 @@ use App\Models\LocationImage;
 use App\Models\OxyApiToken;
 use App\Models\StoreImage;
 use Illuminate\Http\Request;
-use App\Services\External\Oxy\StoreOxyService;
+use App\Services\External\Oxy\LocationOxyService;
 
 class LocationController extends Controller
 {
@@ -33,7 +33,7 @@ class LocationController extends Controller
         try {
             $oxyAccessToken = OxyApiToken::getAccessToken();
 
-            $response = StoreOxyService::getLocations(
+            $response = LocationOxyService::getLocations(
                 token: $oxyAccessToken,
                 name: $request->name ?? null,
                 code: $request->code ?? null,
