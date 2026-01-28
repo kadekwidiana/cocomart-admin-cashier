@@ -1,5 +1,5 @@
 import useUpdateProfile from "@/Features/Profile/useUpdateProfile";
-import { Button, Label, TextInput } from "flowbite-react";
+import { Button, Label, Textarea, TextInput } from "flowbite-react";
 
 export default function UpdateProfileInformationForm({
     mustVerifyEmail,
@@ -90,10 +90,49 @@ export default function UpdateProfileInformationForm({
                         placeholder="Role"
                         required
                         readOnly
-                        value={data.role}
+                        defaultValue={data.role}
                         color={errors.role ? "failure" : "gray"}
-                        onChange={handleChange}
                         helperText={errors.role}
+                    />
+                </div>
+
+                <div>
+                    <div className="mb-2 block">
+                        <Label
+                            htmlFor="phone_number"
+                            value="Phone Number"
+                            color={errors.phone_number ? "failure" : "gray"}
+                        />
+                    </div>
+                    <TextInput
+                        id="phone_number"
+                        name="phone_number"
+                        type="number"
+                        placeholder="Enter your phone number..."
+                        value={data.phone_number}
+                        color={errors.phone_number ? "failure" : "gray"}
+                        onChange={handleChange}
+                        helperText={errors.phone_number}
+                    />
+                </div>
+
+                <div>
+                    <div className="mb-2 block">
+                        <Label
+                            htmlFor="address"
+                            value="Address"
+                            color={errors.address ? "failure" : "gray"}
+                        />
+                    </div>
+                    <Textarea
+                        id="address"
+                        name="address"
+                        type="text"
+                        placeholder="Enter your address..."
+                        value={data.address}
+                        color={errors.address ? "failure" : "gray"}
+                        onChange={handleChange}
+                        helperText={errors.address}
                     />
                 </div>
 

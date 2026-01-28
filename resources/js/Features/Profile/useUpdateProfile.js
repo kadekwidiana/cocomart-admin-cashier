@@ -13,14 +13,8 @@ export default function useUpdateProfile() {
             name: user.name,
             email: user.email,
             role: user.role,
-            phone_number: user.customer?.phone_number,
-            province_code: user.customer?.province_code,
-            province_name: user.customer?.province_name,
-            city_code: user.customer?.city_code,
-            city_name: user.customer?.city_name,
-            sub_district: user.customer?.sub_district,
-            village: user.customer?.village,
-            address: user.customer?.address,
+            phone_number: user?.phone_number,
+            address: user?.address,
         });
 
     const handleChange = (e) => {
