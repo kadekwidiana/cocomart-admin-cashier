@@ -57,7 +57,7 @@ class CategoryController extends Controller
         try {
             $oxyAccessToken = OxyApiToken::getAccessToken();
 
-            $response = CategoryOxyService::getCategories(
+            $response = CategoryOxyService::getSubCategories(
                 token: $oxyAccessToken,
                 name: $request->name ?? null,
                 code: $request->code ?? null,

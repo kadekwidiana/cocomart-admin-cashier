@@ -64,7 +64,7 @@ class CategoryOxyService
         $queryParams = [
             'name' => $name,
             'code' => $code,
-            'page' => $page - 1, // why 1 (karena di api page dimulai dari 0 = 1st page)
+            'page' => $page,
             'size' => $size,
         ];
 

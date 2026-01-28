@@ -6,6 +6,7 @@ import { RiDiscountPercentLine } from "react-icons/ri";
 import { MdOutlineNotificationsActive } from "react-icons/md";
 import { BiCategory } from "react-icons/bi";
 import { GrMapLocation } from "react-icons/gr";
+import { MdOutlineProductionQuantityLimits } from "react-icons/md";
 
 export default function BackpageSidebar({ isVisible }) {
     const { auth } = usePage().props;
@@ -53,6 +54,11 @@ export default function BackpageSidebar({ isVisible }) {
                             href="/locations"
                             label="Location"
                             icon={GrMapLocation}
+                        />
+                        <SidebarMenu
+                            href="/item-masters"
+                            label="Item Master"
+                            icon={MdOutlineProductionQuantityLimits}
                         />
                     </Sidebar.ItemGroup>
                 </Sidebar.Items>
