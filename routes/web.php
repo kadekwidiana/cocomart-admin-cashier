@@ -7,6 +7,7 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromoController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -62,6 +63,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('item-masters/{itemMasterId}', [ItemMasterController::class, 'show'])->name('item-masters.show');
     Route::post('item-masters/image/add/{oxyItemMasterId}', [ItemMasterController::class, 'addImage'])->name('item-masters.addImage');
     Route::delete('item-masters/image/delete/{id}', [ItemMasterController::class, 'deleteImage'])->name('item-masters.deleteImage');
+
+    // user
+    Route::resource('users', UserController::class);
+    Route::post('users/{id}/update', [UserController::class, 'update'])->name('users.update');
 });
 
 require __DIR__ . '/auth.php';

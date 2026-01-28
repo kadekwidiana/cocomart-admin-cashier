@@ -26,7 +26,10 @@ class CreateUserRequest extends FormRequest
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => ['required', 'confirmed', Password::min(8)],
-            'role' => 'required|in:ADMIN,CUSTOMER', // Sesuaikan roles sesuai kebutuhan
+            'role' => 'required|in:ADMIN,CASHIER', // Sesuaikan roles sesuai kebutuhan
+            'phone_number' => ['nullable', 'string', 'max:255'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'oxy_location_id' => 'required_if:role,CASHIER|max:255',
         ];
     }
 }

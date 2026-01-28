@@ -24,9 +24,12 @@ class UpdateUserRequest extends FormRequest
     {
         return [
             'name' => 'sometimes|required|string|max:255',
-            'email' => 'sometimes|required|email|unique:users,email,' . $this->user,
+            'email' => 'sometimes|required|email|unique:users,email,' . $this->id,
             'password' => ['nullable', 'confirmed', Password::min(8)],
-            'role' => 'sometimes|required|in:ADMIN,CUSTOMER',
+            'role' => 'sometimes|required|in:ADMIN,CASHIER',
+            'phone_number' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'address' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'oxy_location_id' => 'sometimes|required_if:role,CASHIER|max:255',
         ];
     }
 }

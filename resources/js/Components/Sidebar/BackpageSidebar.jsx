@@ -7,6 +7,7 @@ import { MdOutlineNotificationsActive } from "react-icons/md";
 import { BiCategory } from "react-icons/bi";
 import { GrMapLocation } from "react-icons/gr";
 import { MdOutlineProductionQuantityLimits } from "react-icons/md";
+import { FiUsers } from "react-icons/fi";
 
 export default function BackpageSidebar({ isVisible }) {
     const { auth } = usePage().props;
@@ -59,6 +60,11 @@ export default function BackpageSidebar({ isVisible }) {
                             href="/item-masters"
                             label="Item Master"
                             icon={MdOutlineProductionQuantityLimits}
+                        />
+                        <SidebarMenu
+                            href="/users"
+                            label="User"
+                            icon={FiUsers}
                         />
                     </Sidebar.ItemGroup>
                 </Sidebar.Items>
