@@ -18,18 +18,14 @@ export default function DetailCategoryPage() {
                         <table className="w-full text-left text-sm text-gray-700 rtl:text-right">
                             <tbody>
                                 <tr className="bg-white">
-                                    <td className="w-1/5 py-2 pr-2">
-                                        Category Name
-                                    </td>
+                                    <td className="w-1/5 py-2 pr-2">Name</td>
                                     <td className="w-3 px-2 py-2">:</td>
                                     <td className="w-full px-2 py-2">
                                         {category.name}
                                     </td>
                                 </tr>
                                 <tr className="bg-white">
-                                    <td className="w-1/5 py-2 pr-2">
-                                        Category Id
-                                    </td>
+                                    <td className="w-1/5 py-2 pr-2">Id</td>
                                     <td className="w-3 px-2 py-2">:</td>
                                     <td className="w-full px-2 py-2">
                                         {category.id}
@@ -37,9 +33,7 @@ export default function DetailCategoryPage() {
                                 </tr>
 
                                 <tr className="bg-white">
-                                    <td className="w-1/5 py-2 pr-2">
-                                        Category Code
-                                    </td>
+                                    <td className="w-1/5 py-2 pr-2">Code</td>
                                     <td className="w-3 px-2 py-2">:</td>
                                     <td className="w-full px-2 py-2">
                                         {category.code}

@@ -20,18 +20,14 @@ export default function DetailLocationPage() {
                         <table className="w-full text-left text-sm text-gray-700 rtl:text-right">
                             <tbody>
                                 <tr className="bg-white">
-                                    <td className="w-1/5 py-2 pr-2">
-                                        Location Name
-                                    </td>
+                                    <td className="w-1/5 py-2 pr-2">Name</td>
                                     <td className="w-3 px-2 py-2">:</td>
                                     <td className="w-full px-2 py-2">
                                         {location.name}
                                     </td>
                                 </tr>
                                 <tr className="bg-white">
-                                    <td className="w-1/5 py-2 pr-2">
-                                        Location Id
-                                    </td>
+                                    <td className="w-1/5 py-2 pr-2">Id</td>
                                     <td className="w-3 px-2 py-2">:</td>
                                     <td className="w-full px-2 py-2">
                                         {location.id}
@@ -39,18 +35,14 @@ export default function DetailLocationPage() {
                                 </tr>
 
                                 <tr className="bg-white">
-                                    <td className="w-1/5 py-2 pr-2">
-                                        Location Code
-                                    </td>
+                                    <td className="w-1/5 py-2 pr-2">Code</td>
                                     <td className="w-3 px-2 py-2">:</td>
                                     <td className="w-full px-2 py-2">
                                         {location.code}
                                     </td>
                                 </tr>
                                 <tr className="bg-white">
-                                    <td className="w-1/5 py-2 pr-2">
-                                        Location Type
-                                    </td>
+                                    <td className="w-1/5 py-2 pr-2">Type</td>
                                     <td className="w-3 px-2 py-2">:</td>
                                     <td className="w-full px-2 py-2">
                                         {location.type}
@@ -58,7 +50,7 @@ export default function DetailLocationPage() {
                                 </tr>
                                 <tr className="bg-white">
                                     <td className="w-1/5 py-2 pr-2">
-                                        Location Address Street
+                                        Address Street
                                     </td>
                                     <td className="w-3 px-2 py-2">:</td>
                                     <td className="w-full px-2 py-2">
