@@ -1,4 +1,5 @@
 import { AddLocationImageModal } from "@/Components/Modal/AddLocationImageModal";
+import { DetailImageModal } from "@/Components/Modal/DetailImageModal";
 import useDeleteLocationImage from "@/Features/Locations/useDeleteLocationImage";
 import BackpageLayout from "@/Layouts/BackpageLayout";
 import { formatDateToEnglish } from "@/Utils/formatDateToEnglish";
@@ -79,14 +80,6 @@ export default function DetailLocationPage() {
 }
 
 function LocationImages({ images, oxyLocationId }) {
-    const [openModal, setOpenModal] = useState(false);
-    const [selectedImage, setSelectedImage] = useState(null);
-
-    const handleOpenDetail = (image) => {
-        setSelectedImage(image);
-        setOpenModal(true);
-    };
-
     const { deleteDataConfirm } = useDeleteLocationImage();
 
     return (
@@ -118,12 +111,12 @@ function LocationImages({ images, oxyLocationId }) {
                                 />
 
                                 <div className="flex justify-end gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => handleOpenDetail(image)}
-                                    >
-                                        <FaInfoCircle className="size-6 text-blue-500" />
-                                    </button>
+                                    <DetailImageModal
+                                        image={image}
+                                        trigger={
+                                            <FaInfoCircle className="size-6 text-blue-500" />
+                                        }
+                                    />
 
                                     <button
                                         type="button"
@@ -141,45 +134,6 @@ function LocationImages({ images, oxyLocationId }) {
                     )}
                 </div>
             </div>
-
-            <Modal
-                show={openModal}
-                onClose={() => setOpenModal(false)}
-                size="lg"
-            >
-                <Modal.Header>Detail Image</Modal.Header>
-
-                <Modal.Body>
-                    {selectedImage && (
-                        <div className="space-y-4">
-                            <img
-                                src={selectedImage.image}
-                                alt="Detail"
-                                className="w-full max-h-96 object-contain rounded"
-                            />
-
-                            <div className="text-sm text-gray-600">
-                                <p>
-                                    <span className="font-medium">
-                                        Created At:
-                                    </span>{" "}
-                                    {formatDateToEnglish(
-                                        selectedImage.created_at ?? "",
-                                    )}
-                                </p>
-                                <p>
-                                    <span className="font-medium">
-                                        Updated At:
-                                    </span>{" "}
-                                    {formatDateToEnglish(
-                                        selectedImage.updated_at ?? "",
-                                    )}
-                                </p>
-                            </div>
-                        </div>
-                    )}
-                </Modal.Body>
-            </Modal>
         </>
     );
 }

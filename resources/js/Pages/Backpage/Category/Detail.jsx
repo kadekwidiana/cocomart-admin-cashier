@@ -1,10 +1,9 @@
 import { AddCategoryImageModal } from "@/Components/Modal/AddCategoryImageModal";
+import { DetailImageModal } from "@/Components/Modal/DetailImageModal";
 import useDeleteCategoryImage from "@/Features/Categories/useDeleteCategoryImage";
 import BackpageLayout from "@/Layouts/BackpageLayout";
-import { formatDateToEnglish } from "@/Utils/formatDateToEnglish";
 import { usePage } from "@inertiajs/react";
-import { Button, Modal } from "flowbite-react";
-import { useState } from "react";
+import { Button } from "flowbite-react";
 import { FaInfoCircle } from "react-icons/fa";
 import { FaTrash } from "react-icons/fa6";
 
@@ -61,14 +60,6 @@ export default function DetailCategoryPage() {
 }
 
 function CategoryImages({ images, oxyCategoryId }) {
-    const [openModal, setOpenModal] = useState(false);
-    const [selectedImage, setSelectedImage] = useState(null);
-
-    const handleOpenDetail = (image) => {
-        setSelectedImage(image);
-        setOpenModal(true);
-    };
-
     const { deleteDataConfirm } = useDeleteCategoryImage();
 
     return (
@@ -100,12 +91,12 @@ function CategoryImages({ images, oxyCategoryId }) {
                                 />
 
                                 <div className="flex justify-end gap-2">
-                                    <button
-                                        type="button"
-                                        onClick={() => handleOpenDetail(image)}
-                                    >
-                                        <FaInfoCircle className="size-6 text-blue-500" />
-                                    </button>
+                                    <DetailImageModal
+                                        image={image}
+                                        trigger={
+                                            <FaInfoCircle className="size-6 text-blue-500" />
+                                        }
+                                    />
 
                                     <button
                                         type="button"
@@ -123,45 +114,6 @@ function CategoryImages({ images, oxyCategoryId }) {
                     )}
                 </div>
             </div>
-
-            <Modal
-                show={openModal}
-                onClose={() => setOpenModal(false)}
-                size="lg"
-            >
-                <Modal.Header>Detail Image</Modal.Header>
-
-                <Modal.Body>
-                    {selectedImage && (
-                        <div className="space-y-4">
-                            <img
-                                src={selectedImage.image}
-                                alt="Detail"
-                                className="w-full max-h-96 object-contain rounded"
-                            />
-
-                            <div className="text-sm text-gray-600">
-                                <p>
-                                    <span className="font-medium">
-                                        Created At:
-                                    </span>{" "}
-                                    {formatDateToEnglish(
-                                        selectedImage.created_at ?? "",
-                                    )}
-                                </p>
-                                <p>
-                                    <span className="font-medium">
-                                        Updated At:
-                                    </span>{" "}
-                                    {formatDateToEnglish(
-                                        selectedImage.updated_at ?? "",
-                                    )}
-                                </p>
-                            </div>
-                        </div>
-                    )}
-                </Modal.Body>
-            </Modal>
         </>
     );
 }
