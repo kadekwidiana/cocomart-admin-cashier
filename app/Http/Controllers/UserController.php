@@ -25,6 +25,7 @@ class UserController extends Controller
             $name     = $request->input('name');
             $role     = $request->input('role');
             $is_active  = $request->input('is_active');
+            $oxy_location_id = $request->input('oxy_location_id');
 
             $query = User::query();
 
@@ -38,6 +39,10 @@ class UserController extends Controller
 
             if ($is_active !== null && $is_active !== '') {
                 $query->where('is_active', (bool) $is_active);
+            }
+
+            if (!empty($oxy_location_id)) {
+                $query->where('oxy_location_id', $oxy_location_id);
             }
 
             $users = $query
@@ -66,7 +71,8 @@ class UserController extends Controller
                     'perpage'    => $perpage,
                     'name'      => $name,
                     'role'      => $role,
-                    'is_active'  => $is_active
+                    'is_active'  => $is_active,
+                    'oxy_location_id' => $oxy_location_id
                 ],
                 'locations' => $locations
             ]);

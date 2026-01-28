@@ -11,6 +11,7 @@ export default function useGetUsers() {
         name: filters?.name ?? '',
         role: filters?.role ?? '',
         is_active: filters?.is_active ?? '',
+        oxy_location_id: filters?.oxy_location_id ?? '',
     });
 
     const handleChange = (key, value) => {

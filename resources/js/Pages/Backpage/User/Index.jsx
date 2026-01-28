@@ -6,11 +6,13 @@ import { PER_PAGES } from "@/Constants/dataOptions";
 import useDeleteUser from "@/Features/Users/useDeleteUser";
 import useGetUsers from "@/Features/Users/useGetUsers";
 import BackpageLayout from "@/Layouts/BackpageLayout";
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import { Button, Label, Select, Table, TextInput } from "flowbite-react";
 import { FaInfoCircle, FaTrash } from "react-icons/fa";
 
 export default function UserPage() {
+    const { locations } = usePage().props;
+
     const { users, isLoading, params, handleChange, getData } = useGetUsers();
 
     const { deleteDataConfirm } = useDeleteUser();
@@ -79,6 +81,26 @@ export default function UserPage() {
                         <option value="0">Inactive</option>
                     </Select>
                 </div>
+                <div>
+                    <div className="mb-2 block">
+                        <Label htmlFor="oxy_location_id" value="Location" />
+                    </div>
+                    <Select
+                        id="oxy_location_id"
+                        value={params.oxy_location_id}
+                        onChange={(e) =>
+                            handleChange("oxy_location_id", e.target.value)
+                        }
+                    >
+                        <option value="">All</option>
+                        {locations.length > 0 &&
+                            locations.map((location) => (
+                                <option key={location.id} value={location.id}>
+                                    {location.name}
+                                </option>
+                            ))}
+                    </Select>
+                </div>
                 <div className="flex gap-2">
                     <Button
                         onClick={getData}
@@ -119,7 +141,7 @@ export default function UserPage() {
                         <Table.HeadCell>Email</Table.HeadCell>
                         <Table.HeadCell>Role</Table.HeadCell>
                         <Table.HeadCell>Status</Table.HeadCell>
-                        <Table.HeadCell>Location Id</Table.HeadCell>
+                        <Table.HeadCell>Location</Table.HeadCell>
                         <Table.HeadCell className="flex items-center justify-center">
                             Actions
                         </Table.HeadCell>
@@ -143,7 +165,11 @@ export default function UserPage() {
                                         {user.is_active ? "Active" : "Inactive"}
                                     </Table.Cell>
                                     <Table.Cell>
-                                        {user.oxy_location_id || "-"}
+                                        {locations.find(
+                                            (location) =>
+                                                location.id ===
+                                                user.oxy_location_id,
+                                        )?.name ?? "-"}
                                     </Table.Cell>
                                     <Table.Cell className="flex items-center justify-center gap-2">
                                         <InputUserModal
