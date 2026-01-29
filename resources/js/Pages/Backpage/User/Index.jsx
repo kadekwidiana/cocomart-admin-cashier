@@ -52,7 +52,7 @@ export default function UserPage() {
                 </div>
                 <div>
                     <div className="mb-2 block">
-                        <Label htmlFor="role" value="Type" />
+                        <Label htmlFor="role" value="Role" />
                     </div>
                     <Select
                         id="role"
