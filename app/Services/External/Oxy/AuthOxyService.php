@@ -5,6 +5,7 @@ namespace App\Services\External\Oxy;
 use App\Helpers\ErrorHandler;
 use Exception;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class AuthOxyService
 {
@@ -17,11 +18,10 @@ class AuthOxyService
         $url = $baseUrl . '/membership/api/auth/customer';
 
         try {
-            $response = Http::asForm()
-                ->post($url, [
-                    'username' => $username,
-                    'password' => $password,
-                ]);
+            $response = Http::post($url, [
+                'username' => $username,
+                'password' => $password,
+            ]);
 
             if (!$response->successful()) {
                 return [
