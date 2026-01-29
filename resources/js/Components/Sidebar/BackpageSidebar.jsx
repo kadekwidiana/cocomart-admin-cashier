@@ -8,6 +8,7 @@ import { BiCategory } from "react-icons/bi";
 import { GrMapLocation } from "react-icons/gr";
 import { MdOutlineProductionQuantityLimits } from "react-icons/md";
 import { FiUsers } from "react-icons/fi";
+import { AiOutlineTransaction } from "react-icons/ai";
 
 export default function BackpageSidebar({ isVisible }) {
     const { auth } = usePage().props;
@@ -65,6 +66,11 @@ export default function BackpageSidebar({ isVisible }) {
                             href="/users"
                             label="User"
                             icon={FiUsers}
+                        />
+                        <SidebarMenu
+                            href="/transactions"
+                            label="Transaction"
+                            icon={AiOutlineTransaction}
                         />
                     </Sidebar.ItemGroup>
                 </Sidebar.Items>

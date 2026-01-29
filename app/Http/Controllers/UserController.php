@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Services\External\Oxy\LocationOxyService;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 
@@ -50,19 +51,17 @@ class UserController extends Controller
                 ->paginate($perpage)
                 ->withQueryString();
 
-            $oxyAccessToken = OxyApiToken::getAccessToken();
+            // Cache locations selama 2 menit
+            $locations = Cache::remember('oxy_locations', 120, function () {
+                $oxyAccessToken = OxyApiToken::getAccessToken();
+                $locationsRes = LocationOxyService::getLocations(token: $oxyAccessToken);
 
-            $locationsRes = LocationOxyService::getLocations(
-                token: $oxyAccessToken,
-            );
+                if (!$locationsRes['success']) {
+                    throw new \Exception('Failed to fetch locations: ' . $locationsRes['message']);
+                }
 
-            if (!$locationsRes['success']) {
-                return back()->withErrors([
-                    'message' => 'Failed to fetch locations. ' . $locationsRes['message'],
-                ]);
-            }
-
-            $locations = $locationsRes['data']['data'];
+                return $locationsRes['data']['data'];
+            });
 
             return Inertia::render('Backpage/User/Index', [
                 'title' => 'User',

@@ -22,3 +22,17 @@ export const NOTIFICATION_TYPES = [
     'SYSTEM',
     'PROMOTION',
 ];
+
+export const TRANSACTION_STATUSES = [
+    "PENDING",
+    "PAID",
+    "CONFIRMED",
+    "IN_PROCESS",
+    "COMPLETED",
+    "CANCELED"
+];
+
+export const TRANSACTION_FULFILLMENT_TYPES = [
+    "PICKUP",
+    "SHIPMENT"
+];

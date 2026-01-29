@@ -7,6 +7,7 @@ use App\Http\Controllers\LocationController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PromoController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -67,6 +68,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // user
     Route::resource('users', UserController::class);
     Route::post('users/{id}/update', [UserController::class, 'update'])->name('users.update');
+
+    // transaction
+    Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
+    Route::get('transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
 });
 
 require __DIR__ . '/auth.php';
