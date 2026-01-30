@@ -34,7 +34,7 @@ export default function Login() {
 
                         {errors.email && (
                             <div className="flex justify-center">
-                                <InputError message="Invalid email or password!" />
+                                <InputError message={errors.email} />
                             </div>
                         )}
 

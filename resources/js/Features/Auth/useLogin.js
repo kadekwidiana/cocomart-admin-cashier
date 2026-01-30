@@ -25,10 +25,14 @@ export default function useLogin() {
                     title: "Login Successful!",
                 });
             },
-            onError: () => {
+            onError: (errors) => {
+                const message =
+                    errors.email ||
+                    "Login Failed! Please check your details again.";
+
                 ToastTopEnd.fire({
                     icon: "error",
-                    title: "Login Failed! Please check your details again.",
+                    title: message,
                 });
             },
         });
