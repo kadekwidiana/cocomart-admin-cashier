@@ -63,6 +63,7 @@ class CategoryController extends Controller
                 code: $request->code ?? null,
                 page: $request->page ?? 0,
                 size: $request->size ?? 20,
+                categoryId: $request->categoryId ?? null
             );
 
             if (!$response['success']) {

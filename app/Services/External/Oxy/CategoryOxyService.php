@@ -55,7 +55,8 @@ class CategoryOxyService
         ?string $name = null,
         ?string $code = null,
         int $page = 0,
-        int $size = 20
+        int $size = 20,
+        ?string $categoryId = null
     ) {
         $baseUrl = env('OXY_BASE_URL_API');
 
@@ -64,6 +65,7 @@ class CategoryOxyService
         $queryParams = [
             'name' => $name,
             'code' => $code,
+            'categoryId' => $categoryId,
             'page' => $page,
             'size' => $size,
         ];
