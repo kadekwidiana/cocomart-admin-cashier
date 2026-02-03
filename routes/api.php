@@ -11,6 +11,17 @@ use App\Http\Controllers\API\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+// -- FALLBACK --
+Route::fallback(function (Request $request) {
+    return ApiResponse::error(
+        [
+            'detail' => 'The requested route was not found.',
+        ],
+        'Resource Not Found',
+        404
+    );
+});
+
 Route::get('/', function () {
     return response()->json(['message' => 'Welcome to the API']);
 });
