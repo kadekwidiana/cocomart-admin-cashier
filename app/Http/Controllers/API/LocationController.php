@@ -93,20 +93,9 @@ class LocationController extends Controller
             $locations = $locations->map(function ($location) use ($images) {
                 $locationId = $location['id'];
 
-                $locationImages = $images->get($locationId, collect())
-                    ->pluck('image')
-                    ->filter()
-                    ->map(fn($image) => url($image))
-                    ->values();
-
-                // fallback default image
-                if ($locationImages->isEmpty()) {
-                    $locationImages = collect([
-                        url('/assets/images/store-default.png'),
-                    ]);
-                }
-
-                $location['images'] = $locationImages;
+                $location['images'] = LocationImageResource::collection(
+                    $images->get($locationId, collect())
+                );
 
                 return $location;
             });

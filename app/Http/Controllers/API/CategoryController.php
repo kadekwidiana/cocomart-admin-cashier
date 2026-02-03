@@ -96,20 +96,9 @@ class CategoryController extends Controller
             $categories = $categories->map(function ($category) use ($images) {
                 $categoryId = $category['categoryId'];
 
-                $categoryImages = $images->get($categoryId, collect())
-                    ->pluck('image')
-                    ->filter()
-                    ->map(fn($image) => url($image))
-                    ->values();
-
-                // fallback default image
-                if ($categoryImages->isEmpty()) {
-                    $categoryImages = collect([
-                        url('/assets/images/category-default.png'),
-                    ]);
-                }
-
-                $category['images'] = $categoryImages;
+                $category['images'] = CategoryImageResource::collection(
+                    $images->get($categoryId, collect())
+                );
 
                 return $category;
             });
