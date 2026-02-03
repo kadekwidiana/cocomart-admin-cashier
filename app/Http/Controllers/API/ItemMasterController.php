@@ -69,6 +69,8 @@ class ItemMasterController extends Controller
                 locationId: $request->locationId ?? null,
                 page: $request->page ?? 0,
                 size: $request->size ?? 20,
+                categoryId: $request->categoryId ?? null,
+                subcategoryId: $request->subcategoryId ?? null
             );
 
             if (!$response['success']) {

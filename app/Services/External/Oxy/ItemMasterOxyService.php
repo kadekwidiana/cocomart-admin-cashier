@@ -57,7 +57,9 @@ class ItemMasterOxyService
         ?string $itemMasterId,
         ?string $locationId,
         int $page = 0,
-        int $size = 20
+        int $size = 20,
+        ?string $categoryId = null,
+        ?string $subcategoryId = null
     ) {
         $baseUrl = env('OXY_BASE_URL_API');
 
@@ -66,6 +68,8 @@ class ItemMasterOxyService
         $queryParams = [
             'itemMasterId' => $itemMasterId,
             'locationId' => $locationId,
+            'categoryId' => $categoryId,
+            'subcategoryId' => $subcategoryId,
             'page' => $page,
             'size' => $size,
         ];
