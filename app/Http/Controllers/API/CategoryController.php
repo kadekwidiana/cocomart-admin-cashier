@@ -52,6 +52,78 @@ class CategoryController extends Controller
         }
     }
 
+    public function getCategoriesWithImages(Request $request)
+    {
+        try {
+            $oxyAccessToken = OxyApiToken::getAccessToken();
+
+            $response = CategoryOxyService::getCategories(
+                token: $oxyAccessToken,
+                name: $request->name ?? null,
+                code: $request->code ?? null,
+                page: $request->page ?? 0,
+                size: $request->size ?? 20,
+            );
+
+            if (($response['success'] ?? false) !== true) {
+                return response()->json(
+                    $response['error'],
+                    $response['code'] ?? 500
+                );
+            }
+
+            $categories = collect($response['data']['data']);
+
+            // Ambil semua oxy_category_id
+            $categoryIds = $categories
+                ->pluck('categoryId')
+                ->filter()
+                ->values();
+
+            if ($categoryIds->isEmpty()) {
+                return response()->json($response['data'], 200);
+            }
+
+            // Ambil semua images (1 query)
+            $images = CategoryImage::whereIn(
+                'oxy_category_id',
+                $categoryIds
+            )
+                ->get()
+                ->groupBy('oxy_category_id');
+
+            // Inject images sebagai array string
+            $categories = $categories->map(function ($category) use ($images) {
+                $categoryId = $category['categoryId'];
+
+                $categoryImages = $images->get($categoryId, collect())
+                    ->pluck('image')
+                    ->filter()
+                    ->map(fn($image) => url($image))
+                    ->values();
+
+                // fallback default image
+                if ($categoryImages->isEmpty()) {
+                    $categoryImages = collect([
+                        url('/assets/images/category-default.png'),
+                    ]);
+                }
+
+                $category['images'] = $categoryImages;
+
+                return $category;
+            });
+
+            $response['data']['data'] = $categories->values();
+
+            return response()->json($response['data'], 200);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Internal server error',
+            ], 500);
+        }
+    }
+
     public function getSubCategories(Request $request)
     {
         try {

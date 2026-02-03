@@ -35,11 +35,13 @@ Route::prefix('v1')->group(function () {
     Route::prefix('category')->group(function () {
         Route::get('/images/{oxyCategoryId}', [CategoryController::class, 'images']);
         Route::get('/', [CategoryController::class, 'getCategories']);
+        Route::get('/with-images', [CategoryController::class, 'getCategoriesWithImages']);
         Route::get('/sub', [CategoryController::class, 'getSubCategories']);
     });
 
     Route::prefix('location')->group(function () {
         Route::get('', [LocationController::class, 'getLocations']);
+        Route::get('/with-images', [LocationController::class, 'getLocationsWithImages']);
         Route::get('/images/{oxyLocationId}', [LocationController::class, 'images']);
     });
 
