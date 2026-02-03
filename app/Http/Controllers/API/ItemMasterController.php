@@ -85,6 +85,137 @@ class ItemMasterController extends Controller
         }
     }
 
+    public function getItemMasterDetailWithImages(Request $request)
+    {
+        try {
+            $oxyAccessToken = OxyApiToken::getAccessToken();
+
+            $response = ItemMasterOxyService::getItemMasterDetail(
+                token: $oxyAccessToken,
+                itemMasterId: $request->itemMasterId,
+                locationId: $request->locationId,
+                page: $request->page ?? 0,
+                size: $request->size ?? 20,
+                categoryId: $request->categoryId,
+                subcategoryId: $request->subcategoryId
+            );
+
+            if (!$response['success']) {
+                return response()->json(
+                    $response['error'],
+                    $response['code'] ?? 500
+                );
+            }
+
+            $itemMasters = collect($response['data']['data']);
+
+            // Ambil semua itemMasterId
+            $itemMasterIds = $itemMasters
+                ->pluck('itemMasterId')
+                ->filter()
+                ->values();
+
+            // Ambil semua image dalam 1 query
+            $images = ItemMasterImage::whereIn(
+                'oxy_item_master_id',
+                $itemMasterIds
+            )->get()
+                ->groupBy('oxy_item_master_id');
+
+            // Inject images ke masing-masing item
+            $itemMasters = $itemMasters->map(function ($item) use ($images) {
+                $item['images'] = ItemMasterImageResource::collection(
+                    $images->get($item['itemMasterId'], collect())
+                );
+
+                return $item;
+            });
+
+            $response['data']['data'] = $itemMasters->values();
+
+            return response()->json($response['data'], 200);
+        } catch (\Throwable $e) {
+            return ApiResponse::error([
+                'detail' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function getItemMasterDetailWithImagesAndIsWishlist(Request $request)
+    {
+        try {
+            $oxyAccessToken = OxyApiToken::getAccessToken();
+
+            $response = ItemMasterOxyService::getItemMasterDetail(
+                token: $oxyAccessToken,
+                itemMasterId: $request->itemMasterId,
+                locationId: $request->locationId,
+                page: $request->page ?? 0,
+                size: $request->size ?? 20,
+                categoryId: $request->categoryId,
+                subcategoryId: $request->subcategoryId
+            );
+
+            if (($response['success'] ?? false) !== true) {
+                return response()->json(
+                    $response['error'],
+                    $response['code'] ?? 500
+                );
+            }
+
+            $itemMasters = collect($response['data']['data']);
+
+            // Ambil semua itemMasterId dari response OXY
+            $itemMasterIds = $itemMasters
+                ->pluck('itemMasterId')
+                ->filter()
+                ->values();
+
+            if ($itemMasterIds->isEmpty()) {
+                $response['data']['data'] = [];
+                return response()->json($response['data'], 200);
+            }
+
+            // Ambil images (1 query)
+            $images = ItemMasterImage::whereIn(
+                'oxy_item_master_id',
+                $itemMasterIds
+            )
+                ->get()
+                ->groupBy('oxy_item_master_id');
+
+            // Ambil wishlist customer (1 query)
+            $wishlistedItemIds = WishList::where(
+                'oxy_customer_id',
+                $request->oxyCustomerId
+            )
+                ->whereIn('oxy_item_master_id', $itemMasterIds)
+                ->pluck('oxy_item_master_id')
+                ->flip(); // jadi lookup cepat
+
+            // Inject images + isWishList
+            $itemMasters = $itemMasters->map(function ($item) use ($images, $wishlistedItemIds) {
+                $itemMasterId = $item['itemMasterId'];
+
+                $item['images'] = ItemMasterImageResource::collection(
+                    $images->get($itemMasterId, collect())
+                );
+
+                $item['isWishList'] = $wishlistedItemIds->has($itemMasterId);
+
+                return $item;
+            });
+
+            $response['data']['data'] = $itemMasters->values();
+
+            return response()->json($response['data'], 200);
+        } catch (\Throwable $e) {
+            return ApiResponse::error([
+                'detail' => $e->getMessage(),
+            ]);
+        }
+    }
+
     public function getItemMasterPrice(string $oxyItemMasterId)
     {
         try {
@@ -228,48 +359,73 @@ class ItemMasterController extends Controller
         }
     }
 
-    public function getItemMasterWishlistByCustomer(string $oxyCustomerId)
-    {
+    public function getItemMasterWishlistByCustomer(
+        string $oxyCustomerId,
+        string $oxyLocationId
+    ) {
         try {
             $oxyAccessToken = OxyApiToken::getAccessToken();
 
+            // Ambil itemMasterId dari wishlist
+            $itemMasterIds = WishList::where('oxy_customer_id', $oxyCustomerId)
+                ->pluck('oxy_item_master_id')
+                ->filter()
+                ->unique()
+                ->values();
+
+            if ($itemMasterIds->isEmpty()) {
+                return ApiResponse::success(
+                    [],
+                    'Wishlist retrieved successfully'
+                );
+            }
+
+            // Ambil semua images dalam 1 query
+            $images = ItemMasterImage::whereIn(
+                'oxy_item_master_id',
+                $itemMasterIds
+            )
+                ->get()
+                ->groupBy('oxy_item_master_id');
+
             $itemMasters = [];
 
-            $wishLists = WishList::where('oxy_customer_id', $oxyCustomerId)->get();
-
-            foreach ($wishLists as $wishList) {
+            foreach ($itemMasterIds as $itemMasterId) {
                 $response = ItemMasterOxyService::getItemMasterDetail(
                     token: $oxyAccessToken,
-                    itemMasterId: $wishList->oxy_item_master_id,
-                    locationId: null,
+                    itemMasterId: $itemMasterId,
+                    locationId: $oxyLocationId,
                     page: 0,
                     size: 1
                 );
 
-                //  guard ketat untuk response OXY
+                // guard ketat response OXY
                 if (
                     ($response['success'] ?? false) !== true ||
-                    !isset($response['data']['data']) ||
-                    empty($response['data']['data']) ||
-                    !isset($response['data']['data'][0])
+                    empty($response['data']['data'][0])
                 ) {
-                    // optional: log untuk monitoring
                     Log::warning('Failed get item master from OXY', [
-                        'oxy_item_master_id' => $wishList->oxy_item_master_id,
+                        'oxy_item_master_id' => $itemMasterId,
                         'response' => $response,
                     ]);
-
-                    continue; // skip item ini
+                    continue;
                 }
 
-                $itemMasters[] = $response['data']['data'][0];
+                $item = $response['data']['data'][0];
+
+                // 3. Inject images (tanpa N+1)
+                $item['images'] = ItemMasterImageResource::collection(
+                    $images->get($itemMasterId, collect())
+                );
+
+                $itemMasters[] = $item;
             }
 
             return ApiResponse::success(
                 $itemMasters,
                 'Wishlist retrieved successfully'
             );
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return ApiResponse::error([
                 'detail' => $e->getMessage(),
             ]);

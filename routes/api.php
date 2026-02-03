@@ -26,6 +26,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/images/{oxyItemMasterId}', [ItemMasterController::class, 'images']);
         Route::get('/', [ItemMasterController::class, 'getItemMasters']);
         Route::get('/detail', [ItemMasterController::class, 'getItemMasterDetail']);
+        Route::get('/detail-with-images', [ItemMasterController::class, 'getItemMasterDetailWithImages']);
         Route::get('/prices/{oxyItemMasterId}', [ItemMasterController::class, 'getItemMasterPrice']);
         Route::get('/stock', [ItemMasterController::class, 'getItemMasterStock']);
         Route::get('/stocklocation/{oxyItemMasterId}', [ItemMasterController::class, 'getItemMasterStockLocation']);
@@ -74,8 +75,9 @@ Route::prefix('v1')->group(function () {
             Route::get('/check-is-wishlist/{oxyItemMasterId}/customer/{oxyCustomerId}', [ItemMasterController::class, 'checkIsWishlist']);
             Route::post('/add-to-wishlist', [ItemMasterController::class, 'addToWishList']);
             Route::delete('/remove-from-wishlist/{oxyItemMasterId}/customer/{oxyCustomerId}', [ItemMasterController::class, 'removeFromWishList']);
-            Route::get('/wishlist-by-customer/{oxyCustomerId}', [ItemMasterController::class, 'getItemMasterWishlistByCustomer']);
+            Route::get('/wishlist-by-customer/{oxyCustomerId}/location/{oxyLocationId}', [ItemMasterController::class, 'getItemMasterWishlistByCustomer']);
             Route::post('/by-ids', [ItemMasterController::class, 'getItemMasterByIds']);
+            Route::get('/detail-with-images-and-is-wishlist/{oxyCustomerId}', [ItemMasterController::class, 'getItemMasterDetailWithImagesAndIsWishlist']);
         });
 
         // transaction
