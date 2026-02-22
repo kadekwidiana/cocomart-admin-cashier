@@ -35,7 +35,7 @@ class TransactionResource extends JsonResource
             'total' => $this->total,
 
             'items' => TransactionItemResource::collection(
-                $this->whenLoaded('items')
+                $this->items
             ),
 
             'pickup' => new TransactionPickupResource(
@@ -45,6 +45,8 @@ class TransactionResource extends JsonResource
             'shipment' => new TransactionShipmentResource(
                 $this->whenLoaded('shipment')
             ),
+
+            'location' => $this->location ? $this->location : null,
 
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at,

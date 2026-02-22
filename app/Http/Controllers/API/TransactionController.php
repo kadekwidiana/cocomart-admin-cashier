@@ -15,6 +15,8 @@ use App\Models\OxyApiToken;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
 use App\Services\External\Oxy\ItemMasterOxyService;
+use App\Services\External\Oxy\LocationOxyService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -66,7 +68,7 @@ class TransactionController extends Controller
         }
     }
 
-    public function show(string $transactionId)
+    public function showSimple(string $transactionId)
     {
         try {
             $transaction = Transaction::query()
@@ -74,13 +76,87 @@ class TransactionController extends Controller
                 ->where('id', $transactionId)
                 ->first();
 
-            return ApiResponse::success([
-                'data' => new TransactionResource($transaction),
-            ], 'Transaction retrieved successfully');
+            return ApiResponse::success(
+                new TransactionResource($transaction),
+                'Transaction retrieved successfully'
+            );
         } catch (\Throwable $e) {
             return ApiResponse::error([
                 'detail' => $e->getMessage(),
             ]);
+        }
+    }
+
+    public function showDetail(string $transactionId)
+    {
+        try {
+            $transaction = Transaction::query()
+                ->with(['items', 'shipment', 'pickup'])
+                ->where('id', $transactionId)
+                ->firstOrFail();
+
+            $oxyAccessToken = OxyApiToken::getAccessToken();
+
+            /**
+             * HANDLE LOCATION API
+             */
+            try {
+                $oxyLocationRes = LocationOxyService::getLocations(
+                    token: $oxyAccessToken,
+                );
+
+                $transaction->setAttribute(
+                    'location',
+                    $oxyLocationRes['data']['data'][0] ?? null
+                );
+            } catch (\Throwable $e) {
+                // jika gagal, tetap lanjut
+                $transaction->setAttribute('location', null);
+            }
+
+            /**
+             * HANDLE ITEM DETAIL API PER ITEM
+             */
+            foreach ($transaction->items as $item) {
+
+                try {
+
+                    $oxyItemDetail = ItemMasterOxyService::getItemMasterDetail(
+                        token: $oxyAccessToken,
+                        itemMasterId: $item->oxy_item_master_id,
+                        locationId: $transaction->oxy_location_id
+                    );
+
+                    $detail = $oxyItemDetail['data']['data'][0] ?? null;
+
+                    $item->setAttribute('oxy_category_id', $detail['category']['categoryId'] ?? null);
+                    $item->setAttribute('oxy_sub_category_id', $detail['subCategory']['subCategoryId'] ?? null);
+                    $item->setAttribute('oxy_code', $detail['code'] ?? null);
+                    $item->setAttribute('oxy_barcode', $detail['barcode'] ?? null);
+                    $item->setAttribute('oxy_name', $detail['name'] ?? null);
+                } catch (\Throwable $e) {
+
+                    // jika API item gagal, tetap isi null
+                    $item->setAttribute('oxy_category_id', null);
+                    $item->setAttribute('oxy_sub_category_id', null);
+                    $item->setAttribute('oxy_code', null);
+                    $item->setAttribute('oxy_barcode', null);
+                    $item->setAttribute('oxy_name', null);
+                }
+            }
+
+            return ApiResponse::success(
+                new TransactionResource($transaction),
+                'Transaction retrieved successfully'
+            );
+        } catch (ModelNotFoundException $e) {
+            return ApiResponse::error([
+                'detail' => 'Transaction not found',
+            ], 404);
+        } catch (\Throwable $e) {
+            return ApiResponse::error([
+                'detail' => $e->getMessage(),
+            ], 500);
         }
     }
 
