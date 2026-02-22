@@ -9,6 +9,7 @@ use App\Services\External\Oxy\ItemMasterOxyService;
 use App\Services\External\Oxy\LocationOxyService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
@@ -25,6 +26,12 @@ class TransactionController extends Controller
             $status           = $request->input('status');
             $start_date       = $request->input('start_date');
             $end_date         = $request->input('end_date');
+
+            $userSession = Auth::user();
+
+            if ($userSession['role'] === 'CASHIER') {
+                $oxy_location_id = $userSession['oxy_location_id'];
+            }
 
             $query = Transaction::query();
 

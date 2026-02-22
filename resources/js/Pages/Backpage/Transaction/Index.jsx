@@ -15,10 +15,13 @@ import { Button, Label, Select, Table, TextInput } from "flowbite-react";
 import { FaInfoCircle } from "react-icons/fa";
 
 export default function TransactionPage() {
+    const { auth } = usePage().props;
     const { locations } = usePage().props;
 
     const { transactions, isLoading, params, handleChange, getData } =
         useGetTransactions();
+
+    console.log(auth);
 
     return (
         <BackpageLayout>
@@ -102,21 +105,38 @@ export default function TransactionPage() {
                     <div className="mb-2 block">
                         <Label htmlFor="oxy_location_id" value="Location" />
                     </div>
-                    <Select
-                        id="oxy_location_id"
-                        value={params.oxy_location_id}
-                        onChange={(e) =>
-                            handleChange("oxy_location_id", e.target.value)
-                        }
-                    >
-                        <option value="">All</option>
-                        {locations.length > 0 &&
-                            locations.map((location) => (
-                                <option key={location.id} value={location.id}>
-                                    {location.name}
-                                </option>
-                            ))}
-                    </Select>
+                    {auth.user.role === "CASHIER" ? (
+                        <TextInput
+                            id="oxy_location_id"
+                            type="text"
+                            value={
+                                locations.find(
+                                    (location) =>
+                                        location.id === params.oxy_location_id,
+                                )?.name ?? "-"
+                            }
+                            readOnly
+                        />
+                    ) : (
+                        <Select
+                            id="oxy_location_id"
+                            value={params.oxy_location_id}
+                            onChange={(e) =>
+                                handleChange("oxy_location_id", e.target.value)
+                            }
+                        >
+                            <option value="">All</option>
+                            {locations.length > 0 &&
+                                locations.map((location) => (
+                                    <option
+                                        key={location.id}
+                                        value={location.id}
+                                    >
+                                        {location.name}
+                                    </option>
+                                ))}
+                        </Select>
+                    )}
                 </div>
                 <div>
                     <div className="mb-2 block">

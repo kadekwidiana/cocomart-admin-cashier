@@ -32,41 +32,45 @@ export default function BackpageSidebar({ isVisible }) {
                             label="Dashboard"
                             icon={HiOutlineChartPie}
                         />
-                        <SidebarMenu
-                            href="/image-sliders"
-                            label="Image Slider"
-                            icon={TfiLayoutSliderAlt}
-                        />
-                        <SidebarMenu
-                            href="/promos"
-                            label="Promo"
-                            icon={RiDiscountPercentLine}
-                        />
-                        <SidebarMenu
-                            href="/notifications"
-                            label="Notification"
-                            icon={MdOutlineNotificationsActive}
-                        />
-                        <SidebarMenu
-                            href="/categories"
-                            label="Category"
-                            icon={BiCategory}
-                        />
-                        <SidebarMenu
-                            href="/locations"
-                            label="Location"
-                            icon={GrMapLocation}
-                        />
-                        <SidebarMenu
-                            href="/item-masters"
-                            label="Item Master"
-                            icon={MdOutlineProductionQuantityLimits}
-                        />
-                        <SidebarMenu
-                            href="/users"
-                            label="User"
-                            icon={FiUsers}
-                        />
+                        {auth.user.role === "ADMIN" && (
+                            <>
+                                <SidebarMenu
+                                    href="/image-sliders"
+                                    label="Image Slider"
+                                    icon={TfiLayoutSliderAlt}
+                                />
+                                <SidebarMenu
+                                    href="/promos"
+                                    label="Promo"
+                                    icon={RiDiscountPercentLine}
+                                />
+                                <SidebarMenu
+                                    href="/notifications"
+                                    label="Notification"
+                                    icon={MdOutlineNotificationsActive}
+                                />
+                                <SidebarMenu
+                                    href="/categories"
+                                    label="Category"
+                                    icon={BiCategory}
+                                />
+                                <SidebarMenu
+                                    href="/locations"
+                                    label="Location"
+                                    icon={GrMapLocation}
+                                />
+                                <SidebarMenu
+                                    href="/item-masters"
+                                    label="Item Master"
+                                    icon={MdOutlineProductionQuantityLimits}
+                                />
+                                <SidebarMenu
+                                    href="/users"
+                                    label="User"
+                                    icon={FiUsers}
+                                />
+                            </>
+                        )}
                         <SidebarMenu
                             href="/transactions"
                             label="Transaction"

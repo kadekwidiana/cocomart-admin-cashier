@@ -23,7 +23,7 @@ class CheckRole
                 ->setStatusCode(403);
         }
 
-        if (Auth::user()->role === 'CUSTOMER') {
+        if (Auth::user()->role === 'CASHIER') {
             return Inertia::render('Error/Error', ['status' => 403])
                 ->toResponse($request)
                 ->setStatusCode(403);
