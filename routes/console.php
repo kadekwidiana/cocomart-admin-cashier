@@ -15,3 +15,7 @@ Artisan::command('inspire', function () {
 Schedule::command('oxy:login')
     ->cron('*/50 * * * *'); // production
 // ->everyTenSeconds(); // test local
+
+Schedule::command('grab:login')
+    ->cron('*/50 * * * *'); // production
+// ->everyTenSeconds(); // test local

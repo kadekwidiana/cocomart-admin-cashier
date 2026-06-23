@@ -7,6 +7,7 @@ use App\Http\Controllers\API\ItemMasterController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\PromoController;
 use App\Http\Controllers\API\LocationController;
+use App\Http\Controllers\API\ShipmentController;
 use App\Http\Controllers\API\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -67,6 +68,9 @@ Route::prefix('v1')->group(function () {
         Route::get('', [ImageSliderController::class, 'index']);
     });
 
+    // shipment webhook (dipanggil oleh Grab, tanpa oxy auth)
+    Route::post('/shipment/webhook', [ShipmentController::class, 'webhook']);
+
     // PROTECTED
     Route::middleware('oxy.auth')->prefix('protected')->group(function () {
         Route::get('/test', function () {
@@ -99,6 +103,14 @@ Route::prefix('v1')->group(function () {
             Route::get('/{transactionId}', [TransactionController::class, 'showSimple']);
             Route::get('/detail/{transactionId}', [TransactionController::class, 'showDetail']);
             Route::post('', [TransactionController::class, 'store']);
+            Route::post('/{transactionId}/pay', [TransactionController::class, 'pay']);
+        });
+
+        // shipment (Grab)
+        Route::prefix('shipment')->group(function () {
+            Route::post('/quote', [ShipmentController::class, 'quote']);
+            Route::get('/{deliveryId}', [ShipmentController::class, 'show']);
+            Route::delete('/{deliveryId}', [ShipmentController::class, 'cancel']);
         });
     });
 });
