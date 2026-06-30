@@ -106,11 +106,11 @@ Route::prefix('v1')->group(function () {
             Route::post('/{transactionId}/pay', [TransactionController::class, 'pay']);
         });
 
-        // shipment (Grab)
         Route::prefix('shipment')->group(function () {
             Route::post('/quote', [ShipmentController::class, 'quote']);
-            Route::get('/{deliveryId}', [ShipmentController::class, 'show']);
-            Route::delete('/{deliveryId}', [ShipmentController::class, 'cancel']);
+            Route::put('/transaction/{transactionId}/receiver', [ShipmentController::class, 'updateReceiver']);
+            Route::get('/transaction/{transactionId}', [ShipmentController::class, 'show']);
+            Route::delete('/transaction/{transactionId}', [ShipmentController::class, 'cancel']);
         });
     });
 });

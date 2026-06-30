@@ -8,6 +8,7 @@ use App\Enums\TransactionStatus;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\Shipment\QuoteShipmentRequest;
+use App\Http\Requests\API\Shipment\UpdateShipmentReceiverRequest;
 use App\Models\GrabApiToken;
 use App\Models\OxyApiToken;
 use App\Models\Transaction;
@@ -15,7 +16,9 @@ use App\Models\TransactionShipment;
 use App\Services\External\Grab\GrabDeliveryPayloadBuilder;
 use App\Services\External\Grab\GrabDeliveryService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -91,11 +94,22 @@ class ShipmentController extends Controller
     }
 
     /**
-     * Cek status / tracking pengiriman berdasarkan delivery id.
+     * Cek status / tracking pengiriman sebuah transaksi.
      */
-    public function show(string $deliveryId)
+    public function show(string $transactionId)
     {
         try {
+            $transaction = Transaction::query()
+                ->with(['shipment'])
+                ->where('id', $transactionId)
+                ->firstOrFail();
+
+            $shipment = $this->resolveShipmentWithDelivery($transaction);
+
+            if ($shipment instanceof JsonResponse) {
+                return $shipment;
+            }
+
             $token = GrabApiToken::getValidAccessToken();
 
             if (!$token) {
@@ -106,7 +120,7 @@ class ShipmentController extends Controller
                 );
             }
 
-            $response = GrabDeliveryService::getDelivery($token, $deliveryId);
+            $response = GrabDeliveryService::getDelivery($token, $shipment->grab_delivery_id);
 
             if (!($response['success'] ?? false)) {
                 return ApiResponse::error(
@@ -116,10 +130,27 @@ class ShipmentController extends Controller
                 );
             }
 
+            // Sinkron status terbaru dari Grab ke DB lokal.
+            $mappedStatus = $this->mapGrabStatus((string) ($response['data']['status'] ?? ''));
+
+            if ($mappedStatus) {
+                $shipment->status = $mappedStatus;
+            }
+            $shipment->grab_json_response = json_encode($response['data']);
+            $shipment->save();
+
+            if ($mappedStatus === TransactionShipmentStatus::DELIVERED) {
+                $transaction->update(['status' => TransactionStatus::COMPLETED]);
+            }
+
             return ApiResponse::success(
                 data: $response['data'],
                 message: 'Delivery retrieved successfully'
             );
+        } catch (ModelNotFoundException $e) {
+            return ApiResponse::error([
+                'detail' => 'Transaction not found',
+            ], 404);
         } catch (\Throwable $e) {
             return ApiResponse::error([
                 'detail' => $e->getMessage(),
@@ -128,11 +159,22 @@ class ShipmentController extends Controller
     }
 
     /**
-     * Batalkan pengiriman berdasarkan delivery id.
+     * Batalkan pengiriman sebuah transaksi (Sistem & Grab).
      */
-    public function cancel(string $deliveryId)
+    public function cancel(string $transactionId)
     {
         try {
+            $transaction = Transaction::query()
+                ->with(['shipment'])
+                ->where('id', $transactionId)
+                ->firstOrFail();
+
+            $shipment = $this->resolveShipmentWithDelivery($transaction);
+
+            if ($shipment instanceof JsonResponse) {
+                return $shipment;
+            }
+
             $token = GrabApiToken::getValidAccessToken();
 
             if (!$token) {
@@ -143,7 +185,7 @@ class ShipmentController extends Controller
                 );
             }
 
-            $response = GrabDeliveryService::cancelDelivery($token, $deliveryId);
+            $response = GrabDeliveryService::cancelDelivery($token, $shipment->grab_delivery_id);
 
             if (!($response['success'] ?? false)) {
                 return ApiResponse::error(
@@ -153,10 +195,22 @@ class ShipmentController extends Controller
                 );
             }
 
+            DB::transaction(function () use ($shipment, $transaction, $response) {
+                $shipment->status = TransactionShipmentStatus::CANCELED;
+                $shipment->grab_json_response = json_encode($response['data']);
+                $shipment->save();
+
+                $transaction->update(['status' => TransactionStatus::CANCELED]);
+            });
+
             return ApiResponse::success(
                 data: $response['data'],
                 message: 'Delivery canceled successfully'
             );
+        } catch (ModelNotFoundException $e) {
+            return ApiResponse::error([
+                'detail' => 'Transaction not found',
+            ], 404);
         } catch (\Throwable $e) {
             return ApiResponse::error([
                 'detail' => $e->getMessage(),
@@ -165,12 +219,99 @@ class ShipmentController extends Controller
     }
 
     /**
+     * Ubah alamat/koordinat & nomor telepon sebuah transaksi.
+     */
+    public function updateReceiver(UpdateShipmentReceiverRequest $request, string $transactionId)
+    {
+        try {
+            $validated = $request->validated();
+
+            $transaction = Transaction::query()
+                ->with(['shipment'])
+                ->where('id', $transactionId)
+                ->firstOrFail();
+
+            if ($transaction->fulfillment_type !== TransactionFulfillmentType::SHIPMENT) {
+                return ApiResponse::error(
+                    data: null,
+                    message: 'Transaction is not a shipment',
+                    statusCode: Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+            }
+
+            $shipment = $transaction->shipment;
+
+            if (!$shipment) {
+                return ApiResponse::error(
+                    data: null,
+                    message: 'Shipment data not found for this transaction',
+                    statusCode: Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+            }
+
+            if ($shipment->grab_delivery_id) {
+                return ApiResponse::error(
+                    data: null,
+                    message: 'Delivery sudah dibuat, alamat & telepon tidak bisa diubah',
+                    statusCode: Response::HTTP_CONFLICT
+                );
+            }
+
+            $shipment->update([
+                'receiver_address' => $validated['shipmentAddress'],
+                'receiver_latitude' => $validated['shipmentLatitude'],
+                'receiver_longitude' => $validated['shipmentLongitude'],
+                'receiver_phone_number' => $validated['receiverPhoneNumber'],
+            ]);
+
+            return ApiResponse::success(
+                data: $shipment,
+                message: 'Receiver updated successfully'
+            );
+        } catch (ModelNotFoundException $e) {
+            return ApiResponse::error([
+                'detail' => 'Transaction not found',
+            ], 404);
+        } catch (\Throwable $e) {
+            return ApiResponse::error([
+                'detail' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    private function resolveShipmentWithDelivery(Transaction $transaction)
+    {
+        if ($transaction->fulfillment_type !== TransactionFulfillmentType::SHIPMENT) {
+            return ApiResponse::error(
+                data: null,
+                message: 'Transaction is not a shipment',
+                statusCode: Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+        }
+
+        $shipment = $transaction->shipment;
+
+        if (!$shipment) {
+            return ApiResponse::error(
+                data: null,
+                message: 'Shipment data not found for this transaction',
+                statusCode: Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+        }
+
+        if (!$shipment->grab_delivery_id) {
+            return ApiResponse::error(
+                data: null,
+                message: 'Delivery belum dibuat untuk transaksi ini (transaksi belum dibayar)',
+                statusCode: Response::HTTP_UNPROCESSABLE_ENTITY
+            );
+        }
+
+        return $shipment;
+    }
+
+    /**
      * Webhook penerima update status delivery dari Grab.
-     *
-     * TODO (belum aktif penuh): verifikasi signature/secret dari Grab dan
-     * sesuaikan field payload dengan dokumentasi Grab Express webhook.
-     * Saat ini hanya memetakan status Grab -> TransactionShipmentStatus dan
-     * menandai transaksi COMPLETED ketika delivery DELIVERED.
      */
     public function webhook(Request $request)
     {

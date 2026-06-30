@@ -7,6 +7,11 @@ use App\Services\External\Oxy\LocationOxyService;
 
 class GrabDeliveryPayloadBuilder
 {
+    private const COUNTRY_CODE = '62'; // Indonesia
+
+    private const DUMMY_SENDER_ADDRESS = 'Jl. Raya Uluwatu No.1, Pecatu, Kec. Kuta Sel., Kabupaten Badung, Bali 80361';
+    private const DUMMY_SENDER_PHONE = '6281234567890';
+
     public static function build(
         Transaction $transaction,
         string $oxyAccessToken,
@@ -17,13 +22,19 @@ class GrabDeliveryPayloadBuilder
 
         $location = self::resolveStoreLocation($oxyAccessToken, $transaction->oxy_location_id);
 
+        $coords = self::storeCoordinates($transaction->oxy_location_id);
+
         $origin = [
-            'address' => $location['addressStreet'] ?? ($location['address'] ?? '-'),
+            'address' => self::DUMMY_SENDER_ADDRESS,
             'coordinates' => [
-                'latitude' => (float) ($location['latitude'] ?? $location['lat'] ?? 0),
-                'longitude' => (float) ($location['longitude'] ?? $location['lng'] ?? 0),
+                'latitude' => (float) ($coords['latitude'] ?? 0),
+                'longitude' => (float) ($coords['longitude'] ?? 0),
             ],
         ];
+
+        if (!empty($coords['cityCode'])) {
+            $origin['cityCode'] = $coords['cityCode'];
+        }
 
         $destination = [
             'address' => $shipment->receiver_address,
@@ -69,16 +80,36 @@ class GrabDeliveryPayloadBuilder
             'highValue' => false,
             'recipient' => [
                 'firstName' => $shipment->receiver_name,
-                'phone' => $shipment->receiver_phone_number,
+                'phone' => self::normalizePhone($shipment->receiver_phone_number),
                 'smsEnabled' => true,
             ],
             'sender' => [
                 'firstName' => $location['name'] ?? 'Store',
                 'companyName' => $location['name'] ?? 'Store',
-                'phone' => $location['phone'] ?? $shipment->receiver_phone_number,
+                'phone' => self::DUMMY_SENDER_PHONE,
                 'smsEnabled' => true,
             ],
         ]);
+    }
+
+    private static function storeCoordinates(string $oxyLocationId): array
+    {
+        return [
+            'latitude'  => -8.655867823660703,
+            'longitude' => 115.16910389011883,
+            'cityCode'  => null,
+        ];
+    }
+
+    private static function normalizePhone(?string $phone): string
+    {
+        $digits = preg_replace('/\D+/', '', (string) $phone);
+
+        if (str_starts_with($digits, '0')) {
+            $digits = self::COUNTRY_CODE . ltrim($digits, '0');
+        }
+
+        return $digits;
     }
 
     public static function resolveStoreLocation(string $oxyAccessToken, string $oxyLocationId): array

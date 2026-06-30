@@ -17,6 +17,7 @@ use App\Models\OxyApiToken;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
 use App\Services\External\Grab\GrabDeliveryPayloadBuilder;
+use App\Services\External\Grab\GrabDeliveryPayloadValidator;
 use App\Services\External\Grab\GrabDeliveryService;
 use App\Services\External\Oxy\ItemMasterOxyService;
 use App\Services\External\Oxy\LocationOxyService;
@@ -24,7 +25,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class TransactionController extends Controller
@@ -352,55 +352,68 @@ class TransactionController extends Controller
             $shipment->grab_vehicle_type = $vehicleType;
             $shipment->grab_service_type = config('services.grab.default_service_type');
 
-            try {
-                $grabToken = GrabApiToken::getValidAccessToken();
+            $grabToken = GrabApiToken::getValidAccessToken();
 
-                if (!$grabToken) {
-                    throw new \Exception('Grab access token not available');
-                }
+            if (!$grabToken) {
+                DB::rollBack();
 
-                $oxyAccessToken = OxyApiToken::getAccessToken();
-
-                $quotePayload = GrabDeliveryPayloadBuilder::build(
-                    transaction: $transaction,
-                    oxyAccessToken: $oxyAccessToken,
-                    vehicleType: $vehicleType
+                return ApiResponse::error(
+                    data: null,
+                    message: 'Grab access token not available',
+                    statusCode: Response::HTTP_SERVICE_UNAVAILABLE
                 );
-
-                $deliveryPayload = GrabDeliveryPayloadBuilder::withDeliveryDetails(
-                    quotePayload: $quotePayload,
-                    transaction: $transaction,
-                    oxyAccessToken: $oxyAccessToken
-                );
-
-                $createRes = GrabDeliveryService::createDelivery($grabToken, $deliveryPayload);
-
-                if (!($createRes['success'] ?? false)) {
-                    throw new \Exception($createRes['message'] ?? 'Grab create delivery failed');
-                }
-
-                $shippingCost = $createRes['data']['quote']['amount'] ?? 0;
-
-                $shipment->grab_delivery_id = $createRes['data']['deliveryID'] ?? null;
-                $shipment->grab_shipping_cost = $shippingCost;
-                $shipment->status = TransactionShipmentStatus::PENDING;
-                $shipment->grab_json_response = json_encode($createRes['data']);
-                $shipment->save();
-
-                $transaction->update([
-                    'shipping_cost' => $shippingCost,
-                    'total' => $transaction->subtotal + $shippingCost,
-                ]);
-            } catch (\Throwable $e) {
-                Log::warning('[GRAB] Create delivery failed on pay: ' . $e->getMessage());
-
-                $shipment->grab_delivery_id = null;
-                $shipment->grab_json_response = json_encode([
-                    'note' => 'Grab delivery failed, awaiting retry',
-                    'error' => $e->getMessage(),
-                ]);
-                $shipment->save();
             }
+
+            $oxyAccessToken = OxyApiToken::getAccessToken();
+
+            $quotePayload = GrabDeliveryPayloadBuilder::build(
+                transaction: $transaction,
+                oxyAccessToken: $oxyAccessToken,
+                vehicleType: $vehicleType
+            );
+
+            $deliveryPayload = GrabDeliveryPayloadBuilder::withDeliveryDetails(
+                quotePayload: $quotePayload,
+                transaction: $transaction,
+                oxyAccessToken: $oxyAccessToken
+            );
+
+            $payloadErrors = GrabDeliveryPayloadValidator::validate($deliveryPayload);
+
+            if (!empty($payloadErrors)) {
+                DB::rollBack();
+
+                return ApiResponse::error(
+                    data: $payloadErrors,
+                    message: 'Invalid Grab delivery payload',
+                    statusCode: Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+            }
+
+            $createRes = GrabDeliveryService::createDelivery($grabToken, $deliveryPayload);
+
+            if (!($createRes['success'] ?? false)) {
+                DB::rollBack();
+
+                return ApiResponse::error(
+                    data: $createRes['error'] ?? null,
+                    message: $createRes['message'] ?? 'Grab create delivery failed',
+                    statusCode: $createRes['code'] ?? Response::HTTP_BAD_GATEWAY
+                )->header('X-Error-Source', 'grab');
+            }
+
+            $shippingCost = $createRes['data']['quote']['amount'] ?? 0;
+
+            $shipment->grab_delivery_id = $createRes['data']['deliveryID'] ?? null;
+            $shipment->grab_shipping_cost = $shippingCost;
+            $shipment->status = TransactionShipmentStatus::PENDING;
+            $shipment->grab_json_response = json_encode($createRes['data']);
+            $shipment->save();
+
+            $transaction->update([
+                'shipping_cost' => $shippingCost,
+                'total' => $transaction->subtotal + $shippingCost,
+            ]);
 
             DB::commit();
 
