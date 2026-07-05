@@ -20,7 +20,7 @@ class NotificationResource extends JsonResource
             'image' => $this->image ? url($this->image) : null,
             'type' => $this->type,
             'body' => $this->body,
-            'isRead' => (bool) $this->notificationReadOne !== false,
+            'isRead' => $this->notificationReadOne !== null,
             'createdAt' => $this->created_at,
             'updatedAt' => $this->updated_at?->format('Y-m-d H:i:s'),
         ];

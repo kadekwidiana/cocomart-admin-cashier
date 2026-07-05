@@ -30,10 +30,10 @@ class CreateTransactionRequest extends FormRequest
             'oxyLocationId' => 'required|string',
             'fulfillmentType' => 'required|in:SHIPMENT,PICKUP',
 
-            'receiverName' => 'required|string|max:100',
-            'receiverPhoneNumber' => 'required|string|max:20',
+            'receiverName' => 'nullable|string|max:100',
+            'receiverPhoneNumber' => 'nullable|string|max:20',
 
-            'pickupTime' => 'required_if:fulfillmentType,PICKUP|date',
+            'pickupTime' => 'nullable|date',
 
             'shipmentAddress' => 'required_if:fulfillmentType,SHIPMENT|string',
             'shipmentLatitude' => 'required_if:fulfillmentType,SHIPMENT|numeric',

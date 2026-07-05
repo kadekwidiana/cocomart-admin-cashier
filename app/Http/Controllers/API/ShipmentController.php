@@ -9,6 +9,7 @@ use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\Shipment\QuoteShipmentRequest;
 use App\Http\Requests\API\Shipment\UpdateShipmentReceiverRequest;
+use App\Http\Resources\Transaction\TransactionShipmentResource;
 use App\Models\GrabApiToken;
 use App\Models\OxyApiToken;
 use App\Models\Transaction;
@@ -219,7 +220,7 @@ class ShipmentController extends Controller
     }
 
     /**
-     * Ubah alamat/koordinat & nomor telepon sebuah transaksi.
+     * Ubah alamat/koordinat & nomor telepon penerima.
      */
     public function updateReceiver(UpdateShipmentReceiverRequest $request, string $transactionId)
     {
@@ -227,29 +228,11 @@ class ShipmentController extends Controller
             $validated = $request->validated();
 
             $transaction = Transaction::query()
-                ->with(['shipment'])
+                ->with(['shipment', 'pickup'])
                 ->where('id', $transactionId)
                 ->firstOrFail();
 
-            if ($transaction->fulfillment_type !== TransactionFulfillmentType::SHIPMENT) {
-                return ApiResponse::error(
-                    data: null,
-                    message: 'Transaction is not a shipment',
-                    statusCode: Response::HTTP_UNPROCESSABLE_ENTITY
-                );
-            }
-
-            $shipment = $transaction->shipment;
-
-            if (!$shipment) {
-                return ApiResponse::error(
-                    data: null,
-                    message: 'Shipment data not found for this transaction',
-                    statusCode: Response::HTTP_UNPROCESSABLE_ENTITY
-                );
-            }
-
-            if ($shipment->grab_delivery_id) {
+            if ($transaction->shipment && $transaction->shipment->grab_delivery_id) {
                 return ApiResponse::error(
                     data: null,
                     message: 'Delivery sudah dibuat, alamat & telepon tidak bisa diubah',
@@ -257,15 +240,36 @@ class ShipmentController extends Controller
                 );
             }
 
-            $shipment->update([
-                'receiver_address' => $validated['shipmentAddress'],
-                'receiver_latitude' => $validated['shipmentLatitude'],
-                'receiver_longitude' => $validated['shipmentLongitude'],
-                'receiver_phone_number' => $validated['receiverPhoneNumber'],
-            ]);
+            $shipment = DB::transaction(function () use ($transaction, $validated) {
+                if ($transaction->fulfillment_type !== TransactionFulfillmentType::SHIPMENT) {
+                    $transaction->update([
+                        'fulfillment_type' => TransactionFulfillmentType::SHIPMENT,
+                    ]);
+                }
+
+                $receiverName = $validated['receiverName']
+                    ?? $transaction->shipment?->receiver_name
+                    ?? $transaction->pickup?->receiver_name;
+
+                $shipment = $transaction->shipment()->updateOrCreate(
+                    ['transaction_id' => $transaction->id],
+                    [
+                        'receiver_name' => $receiverName,
+                        'receiver_phone_number' => $validated['receiverPhoneNumber'],
+                        'receiver_address' => $validated['shipmentAddress'],
+                        'receiver_latitude' => $validated['shipmentLatitude'],
+                        'receiver_longitude' => $validated['shipmentLongitude'],
+                        'status' => $transaction->shipment?->status ?? TransactionShipmentStatus::PENDING,
+                    ]
+                );
+
+                $transaction->pickup()->delete();
+
+                return $shipment;
+            });
 
             return ApiResponse::success(
-                data: $shipment,
+                data: new TransactionShipmentResource($shipment),
                 message: 'Receiver updated successfully'
             );
         } catch (ModelNotFoundException $e) {

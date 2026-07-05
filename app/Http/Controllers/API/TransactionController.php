@@ -267,8 +267,8 @@ class TransactionController extends Controller
                     'grab_vehicle_type' => null,
                     'grab_service_type' => null,
                     'status' => TransactionShipmentStatus::PENDING,
-                    'receiver_name' => $validated['receiverName'],
-                    'receiver_phone_number' => $validated['receiverPhoneNumber'],
+                    'receiver_name' => $validated['receiverName'] ?? null,
+                    'receiver_phone_number' => $validated['receiverPhoneNumber'] ?? null,
                     'receiver_address' => $validated['shipmentAddress'],
                     'receiver_latitude' => $validated['shipmentLatitude'],
                     'receiver_longitude' => $validated['shipmentLongitude'],
@@ -285,10 +285,10 @@ class TransactionController extends Controller
 
                 $transaction->pickup()->create([
                     'pickup_code' => (string) Str::ulid(),
-                    'pickup_time' => $validated['pickupTime'],
+                    'pickup_time' => $validated['pickupTime'] ?? now(),
                     'pickup_end_time' => $validated['pickupEndTime'] ?? null,
-                    'receiver_name' => $validated['receiverName'],
-                    'receiver_phone_number' => $validated['receiverPhoneNumber'],
+                    'receiver_name' => $validated['receiverName'] ?? null,
+                    'receiver_phone_number' => $validated['receiverPhoneNumber'] ?? null,
                     'status' => TransactionPickupStatus::PENDING,
                 ]);
             }
@@ -329,9 +329,29 @@ class TransactionController extends Controller
             }
 
             if ($transaction->fulfillment_type !== TransactionFulfillmentType::SHIPMENT) {
+
+                $transaction->update([
+                    'status' => TransactionStatus::PAID,
+                    'shipping_cost' => 0,
+                    'total' => $transaction->subtotal,
+                ]);
+
+                DB::commit();
+
+                $transaction->refresh()->load(['items', 'shipment', 'pickup']);
+
+                return ApiResponse::success(
+                    data: new TransactionResource($transaction),
+                    message: 'Transaction paid successfully'
+                );
+            }
+
+            $vehicleType = $validated['vehicleType'] ?? null;
+
+            if (!$vehicleType) {
                 return ApiResponse::error(
                     data: null,
-                    message: 'Only SHIPMENT transactions can be paid through this endpoint',
+                    message: 'vehicleType is required for SHIPMENT transactions',
                     statusCode: Response::HTTP_UNPROCESSABLE_ENTITY
                 );
             }
@@ -348,7 +368,6 @@ class TransactionController extends Controller
 
             $transaction->update(['status' => TransactionStatus::PAID]);
 
-            $vehicleType = $validated['vehicleType'];
             $shipment->grab_vehicle_type = $vehicleType;
             $shipment->grab_service_type = config('services.grab.default_service_type');
 
@@ -385,7 +404,7 @@ class TransactionController extends Controller
 
                 return ApiResponse::error(
                     data: $payloadErrors,
-                    message: 'Invalid Grab delivery payload',
+                    message: $payloadErrors[0] ?? 'Invalid Grab delivery payload',
                     statusCode: Response::HTTP_UNPROCESSABLE_ENTITY
                 );
             }

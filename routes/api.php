@@ -83,7 +83,7 @@ Route::prefix('v1')->group(function () {
         // notification
         Route::prefix('notification')->group(function () {
             Route::get('/customer/{oxyCustomerId}', [NotificationController::class, 'index']);
-            Route::get('count', [NotificationController::class, 'count']);
+            Route::get('count/{oxyCustomerId}', [NotificationController::class, 'count']);
             Route::post('read', [NotificationController::class, 'read']);
         });
 

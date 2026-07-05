@@ -61,9 +61,14 @@ class NotificationController extends Controller
         }
     }
 
-    public function count()
+    public function count(string $oxyCustomerId)
     {
-        return ApiResponse::success(Notification::count(), 'Notifications count retrieved successfully');
+        $count = Notification::whereDoesntHave(
+            'notificationReadOne',
+            fn($q) => $q->where('oxy_customer_id', $oxyCustomerId)
+        )->count();
+
+        return ApiResponse::success($count, 'Notifications count retrieved successfully');
     }
 
     public function read(ReadNotificationRequest $request)

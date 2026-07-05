@@ -18,7 +18,7 @@ class PayTransactionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'vehicleType' => 'required|string|in:BIKE,CAR',
+            'vehicleType' => 'nullable|string|in:BIKE,CAR',
         ];
     }
 

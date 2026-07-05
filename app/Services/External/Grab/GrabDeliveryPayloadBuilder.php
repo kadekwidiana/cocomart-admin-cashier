@@ -58,7 +58,6 @@ class GrabDeliveryPayloadBuilder
         return [
             'serviceType' => $serviceType ?? config('services.grab.default_service_type'),
             'vehicleType' => $vehicleType,
-            'codType' => 'REGULAR',
             'packages' => $packages,
             'origin' => $origin,
             'destination' => $destination,

@@ -22,6 +22,7 @@ class UpdateShipmentReceiverRequest extends FormRequest
             'shipmentLatitude' => 'required|numeric',
             'shipmentLongitude' => 'required|numeric',
             'receiverPhoneNumber' => 'required|string|max:20',
+            'receiverName' => 'nullable|string|max:100',
         ];
     }
 

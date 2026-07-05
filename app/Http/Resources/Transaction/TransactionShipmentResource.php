@@ -20,6 +20,8 @@ class TransactionShipmentResource extends JsonResource
             'receiverName' => $this->receiver_name,
             'receiverPhoneNumber' => $this->receiver_phone_number,
             'receiverAddress' => $this->receiver_address,
+            'receiverLatitude' => $this->receiver_latitude,
+            'receiverLongitude' => $this->receiver_longitude,
             'status' => [
                 'value' => $this->status?->value,
                 'label' => $this->status?->label(),
