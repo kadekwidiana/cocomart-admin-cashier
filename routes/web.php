@@ -74,6 +74,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // transaction
     Route::get('transactions', [TransactionController::class, 'index'])->name('transactions.index');
     Route::get('transactions/{id}', [TransactionController::class, 'show'])->name('transactions.show');
+    Route::patch('/transactions/{id}/status', [TransactionController::class, 'updateStatus']);
+    Route::patch('/transactions/{id}/pickup-status', [TransactionController::class, 'updatePickupStatus']);
+    Route::patch('/transactions/{id}/shipment-status', [TransactionController::class, 'updateShipmentStatus']);
 });
 
 require __DIR__ . '/auth.php';

@@ -1,8 +1,10 @@
+import { UpdateStatusModal } from "@/Components/Modal/UpdateStatusModal";
 import BackpageLayout from "@/Layouts/BackpageLayout";
 import { formatDateToEnglish } from "@/Utils/formatDateToEnglish";
 import { formatRupiah } from "@/Utils/formatNumber";
 import { Link, usePage } from "@inertiajs/react";
-import { FaInfoCircle } from "react-icons/fa";
+import { Button } from "flowbite-react";
+import { FaEdit, FaInfoCircle } from "react-icons/fa";
 
 export default function DetailTransactionPage() {
     const { transaction, itemMasters, locations, customer } = usePage().props;
@@ -43,7 +45,22 @@ export default function DetailTransactionPage() {
                                     <td className="w-1/5 py-2 pr-2">Status</td>
                                     <td className="w-3 px-2 py-2">:</td>
                                     <td className="w-full px-2 py-2">
-                                        {transaction.status}
+                                        <div className="flex items-center gap-2">
+                                            <span>{transaction.status}</span>
+                                            <UpdateStatusModal
+                                                type="transaction"
+                                                transaction={transaction}
+                                                trigger={
+                                                    <Button
+                                                        size="xs"
+                                                        color="none"
+                                                        className="border-primary/100 border hover:bg-primary/10 text-primary/100"
+                                                    >
+                                                        <FaEdit />
+                                                    </Button>
+                                                }
+                                            />
+                                        </div>
                                     </td>
                                 </tr>
                                 <tr className="bg-white">
@@ -53,6 +70,15 @@ export default function DetailTransactionPage() {
                                     <td className="w-3 px-2 py-2">:</td>
                                     <td className="w-full px-2 py-2">
                                         {transaction.fulfillment_type}
+                                    </td>
+                                </tr>
+                                <tr className="bg-white">
+                                    <td className="w-1/5 py-2 pr-2">
+                                        Payment Type
+                                    </td>
+                                    <td className="w-3 px-2 py-2">:</td>
+                                    <td className="w-full px-2 py-2">
+                                        {transaction.payment_type}
                                     </td>
                                 </tr>
                                 <tr className="bg-white">
@@ -350,8 +376,25 @@ export default function DetailTransactionPage() {
                                         </td>
                                         <td className="w-3 px-2 py-2">:</td>
                                         <td className="w-full px-2 py-2">
-                                            {transaction.shipment?.status ||
-                                                "-"}
+                                            <div className="flex items-center gap-2">
+                                                <span>
+                                                    {transaction.shipment
+                                                        ?.status || "-"}
+                                                </span>
+                                                <UpdateStatusModal
+                                                    type="shipment"
+                                                    transaction={transaction}
+                                                    trigger={
+                                                        <Button
+                                                            size="xs"
+                                                            color="none"
+                                                            className="border-primary/100 border hover:bg-primary/10 text-primary/100"
+                                                        >
+                                                            <FaEdit />
+                                                        </Button>
+                                                    }
+                                                />
+                                            </div>
                                         </td>
                                     </tr>
 
@@ -471,7 +514,25 @@ export default function DetailTransactionPage() {
                                         </td>
                                         <td className="w-3 px-2 py-2">:</td>
                                         <td className="w-full px-2 py-2">
-                                            {transaction.pickup?.status || "-"}
+                                            <div className="flex items-center gap-2">
+                                                <span>
+                                                    {transaction.pickup
+                                                        ?.status || "-"}
+                                                </span>
+                                                <UpdateStatusModal
+                                                    type="pickup"
+                                                    transaction={transaction}
+                                                    trigger={
+                                                        <Button
+                                                            size="xs"
+                                                            color="none"
+                                                            className="border-primary/100 border hover:bg-primary/10 text-primary/100"
+                                                        >
+                                                            <FaEdit />
+                                                        </Button>
+                                                    }
+                                                />
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
