@@ -28,7 +28,7 @@ class TransactionResource extends JsonResource
                 'value' => $this->fulfillment_type?->value,
                 'label' => $this->fulfillment_type?->label(),
             ],
-
+            'paymentType' => $this->payment_type,
             'subtotal' => $this->subtotal,
             'discount' => $this->discount,
             'shippingCost' => $this->shipping_cost,

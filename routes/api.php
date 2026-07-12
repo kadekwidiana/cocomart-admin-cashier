@@ -7,6 +7,9 @@ use App\Http\Controllers\API\ItemMasterController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\PromoController;
 use App\Http\Controllers\API\LocationController;
+use App\Http\Controllers\API\PaylabsController;
+use App\Http\Controllers\API\PaylabsNotificationController;
+use App\Http\Controllers\API\PaylabsQrisController;
 use App\Http\Controllers\API\ShipmentController;
 use App\Http\Controllers\API\TransactionController;
 use Illuminate\Http\Request;
@@ -104,6 +107,10 @@ Route::prefix('v1')->group(function () {
             Route::get('/detail/{transactionId}', [TransactionController::class, 'showDetail']);
             Route::post('', [TransactionController::class, 'store']);
             Route::post('/{transactionId}/pay', [TransactionController::class, 'pay']);
+            // payment
+            Route::post('/payment/paylabs', [PaylabsController::class, 'store']);
+            Route::get('/payment/paylabs/inquiry/{transactionId}', [PaylabsController::class, 'inquiry']);
+            Route::post('/payment/paylabs/cancel', [PaylabsController::class, 'cancel']);
         });
 
         Route::prefix('shipment')->group(function () {
@@ -114,3 +121,7 @@ Route::prefix('v1')->group(function () {
         });
     });
 });
+
+
+// webhook paylabs
+Route::post('/paylabs/notify', [PaylabsNotificationController::class, 'notify']);
