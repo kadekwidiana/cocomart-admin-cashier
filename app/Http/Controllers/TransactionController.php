@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\TransactionPickupStatus;
+use App\Enums\TransactionShipmentStatus;
+use App\Enums\TransactionStatus;
 use App\Models\OxyApiToken;
 use App\Models\Transaction;
 use App\Services\External\Oxy\CustomerOxyService;
@@ -12,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rules\Enum;
 use Inertia\Inertia;
 
 class TransactionController extends Controller
@@ -172,6 +176,75 @@ class TransactionController extends Controller
         } catch (\Throwable $e) {
             return back()->withErrors([
                 'message' => 'Failed to fetch transaction. ' . $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function updateStatus(Request $request, string $id)
+    {
+        try {
+            $request->validate([
+                'status' => ['required', new Enum(TransactionStatus::class)],
+            ]);
+
+            $transaction = Transaction::query()->findOrFail($id);
+
+            $transaction->update(['status' => $request->status]);
+
+            return back()->with('success', 'Transaction status updated successfully');
+        } catch (\Throwable $e) {
+            return back()->withErrors([
+                'message' => 'Failed to update transaction status. ' . $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function updatePickupStatus(Request $request, string $id)
+    {
+        try {
+            $request->validate([
+                'status' => ['required', new Enum(TransactionPickupStatus::class)],
+            ]);
+
+            $transaction = Transaction::query()->with('pickup')->findOrFail($id);
+
+            if (!$transaction->pickup) {
+                return back()->withErrors([
+                    'message' => 'Pickup data not found for this transaction',
+                ]);
+            }
+
+            $transaction->pickup->update(['status' => $request->status]);
+
+            return back()->with('success', 'Pickup status updated successfully');
+        } catch (\Throwable $e) {
+            return back()->withErrors([
+                'message' => 'Failed to update pickup status. ' . $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function updateShipmentStatus(Request $request, string $id)
+    {
+        try {
+            $request->validate([
+                'status' => ['required', new Enum(TransactionShipmentStatus::class)],
+            ]);
+
+            $transaction = Transaction::query()->with('shipment')->findOrFail($id);
+
+            if (!$transaction->shipment) {
+                return back()->withErrors([
+                    'message' => 'Shipment data not found for this transaction',
+                ]);
+            }
+
+            $transaction->shipment->update(['status' => $request->status]);
+
+            return back()->with('success', 'Shipment status updated successfully');
+        } catch (\Throwable $e) {
+            return back()->withErrors([
+                'message' => 'Failed to update shipment status. ' . $e->getMessage(),
             ]);
         }
     }

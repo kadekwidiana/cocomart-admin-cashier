@@ -35,4 +35,14 @@ return [
         ],
     ],
 
+    'grab' => [
+        'endpoint' => env('GRAB_ENDPOINT'),
+        'client_id' => env('GRAB_CLIENT_ID'),
+        'client_secret' => env('GRAB_CLIENT_SECRET'),
+        'scope' => env('GRAB_SCOPE', 'grab_express.partner_deliveries'),
+        'delivery_path' => env('GRAB_DELIVERY_PATH', 'grab-express-sandbox'),
+        'default_service_type' => env('GRAB_SERVICE_TYPE', 'INSTANT'),
+        'default_vehicle_type' => env('GRAB_VEHICLE_TYPE', 'BIKE'),
+    ],
+
 ];

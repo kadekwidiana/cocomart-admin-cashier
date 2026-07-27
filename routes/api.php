@@ -7,6 +7,10 @@ use App\Http\Controllers\API\ItemMasterController;
 use App\Http\Controllers\API\NotificationController;
 use App\Http\Controllers\API\PromoController;
 use App\Http\Controllers\API\LocationController;
+use App\Http\Controllers\API\PaylabsController;
+use App\Http\Controllers\API\PaylabsNotificationController;
+use App\Http\Controllers\API\PaylabsQrisController;
+use App\Http\Controllers\API\ShipmentController;
 use App\Http\Controllers\API\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -67,6 +71,9 @@ Route::prefix('v1')->group(function () {
         Route::get('', [ImageSliderController::class, 'index']);
     });
 
+    // shipment webhook (dipanggil oleh Grab, tanpa oxy auth)
+    Route::post('/shipment/webhook', [ShipmentController::class, 'webhook']);
+
     // PROTECTED
     Route::middleware('oxy.auth')->prefix('protected')->group(function () {
         Route::get('/test', function () {
@@ -79,7 +86,7 @@ Route::prefix('v1')->group(function () {
         // notification
         Route::prefix('notification')->group(function () {
             Route::get('/customer/{oxyCustomerId}', [NotificationController::class, 'index']);
-            Route::get('count', [NotificationController::class, 'count']);
+            Route::get('count/{oxyCustomerId}', [NotificationController::class, 'count']);
             Route::post('read', [NotificationController::class, 'read']);
         });
 
@@ -99,6 +106,22 @@ Route::prefix('v1')->group(function () {
             Route::get('/{transactionId}', [TransactionController::class, 'showSimple']);
             Route::get('/detail/{transactionId}', [TransactionController::class, 'showDetail']);
             Route::post('', [TransactionController::class, 'store']);
+            Route::post('/{transactionId}/pay', [TransactionController::class, 'pay']);
+            // payment
+            Route::post('/payment/paylabs', [PaylabsController::class, 'store']);
+            Route::get('/payment/paylabs/inquiry/{transactionId}', [PaylabsController::class, 'inquiry']);
+            Route::post('/payment/paylabs/cancel', [PaylabsController::class, 'cancel']);
+        });
+
+        Route::prefix('shipment')->group(function () {
+            Route::post('/quote', [ShipmentController::class, 'quote']);
+            Route::put('/transaction/{transactionId}/receiver', [ShipmentController::class, 'updateReceiver']);
+            Route::get('/transaction/{transactionId}', [ShipmentController::class, 'show']);
+            Route::delete('/transaction/{transactionId}', [ShipmentController::class, 'cancel']);
         });
     });
 });
+
+
+// webhook paylabs
+Route::post('/paylabs/notify', [PaylabsNotificationController::class, 'notify']);

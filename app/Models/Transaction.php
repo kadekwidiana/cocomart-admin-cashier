@@ -23,6 +23,7 @@ class Transaction extends Model
         'oxy_location_id',
         'status',
         'fulfillment_type',
+        'payment_type',
         'payment_token',
         'subtotal',
         'discount',

@@ -9,18 +9,22 @@ use App\Enums\TransactionStatus;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\Transaction\CreateTransactionRequest;
+use App\Http\Requests\API\Transaction\PayTransactionRequest;
 use App\Http\Resources\PaginationResource;
 use App\Http\Resources\Transaction\TransactionResource;
+use App\Models\GrabApiToken;
 use App\Models\OxyApiToken;
 use App\Models\Transaction;
 use App\Models\TransactionItem;
+use App\Services\External\Grab\GrabDeliveryPayloadBuilder;
+use App\Services\External\Grab\GrabDeliveryPayloadValidator;
+use App\Services\External\Grab\GrabDeliveryService;
 use App\Services\External\Oxy\ItemMasterOxyService;
 use App\Services\External\Oxy\LocationOxyService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class TransactionController extends Controller
@@ -257,25 +261,18 @@ class TransactionController extends Controller
              */
             if ($validated['fulfillmentType'] === TransactionFulfillmentType::SHIPMENT->value) {
 
-                // sementara dummy (API Grab async nanti)
-                $shipmentPayload = [
-                    'grab_delivery_id' => (string) Str::ulid(),
+                $transaction->shipment()->create([
+                    'grab_delivery_id' => null,
                     'grab_shipping_cost' => 0,
+                    'grab_vehicle_type' => null,
+                    'grab_service_type' => null,
                     'status' => TransactionShipmentStatus::PENDING,
-                    'receiver_name' => $validated['receiverName'],
-                    'receiver_phone_number' => $validated['receiverPhoneNumber'],
+                    'receiver_name' => $validated['receiverName'] ?? null,
+                    'receiver_phone_number' => $validated['receiverPhoneNumber'] ?? null,
                     'receiver_address' => $validated['shipmentAddress'],
-                    'grab_json_response' => json_encode([
-                        'note' => 'Grab integration pending'
-                    ]),
-                ];
-
-                $transaction->shipment()->create($shipmentPayload);
-
-                // update total jika ada ongkir
-                $transaction->update([
-                    'shipping_cost' => $shipmentPayload['grab_shipping_cost'],
-                    'total' => $transaction->subtotal + $shipmentPayload['grab_shipping_cost'],
+                    'receiver_latitude' => $validated['shipmentLatitude'],
+                    'receiver_longitude' => $validated['shipmentLongitude'],
+                    'grab_json_response' => null,
                 ]);
             }
 
@@ -288,10 +285,10 @@ class TransactionController extends Controller
 
                 $transaction->pickup()->create([
                     'pickup_code' => (string) Str::ulid(),
-                    'pickup_time' => $validated['pickupTime'],
+                    'pickup_time' => $validated['pickupTime'] ?? now(),
                     'pickup_end_time' => $validated['pickupEndTime'] ?? null,
-                    'receiver_name' => $validated['receiverName'],
-                    'receiver_phone_number' => $validated['receiverPhoneNumber'],
+                    'receiver_name' => $validated['receiverName'] ?? null,
+                    'receiver_phone_number' => $validated['receiverPhoneNumber'] ?? null,
                     'status' => TransactionPickupStatus::PENDING,
                 ]);
             }
@@ -308,6 +305,155 @@ class TransactionController extends Controller
             return ApiResponse::error([
                 'detail' => $e->getMessage(),
             ], 'Failed to create transaction');
+        }
+    }
+
+    public function pay(PayTransactionRequest $request, string $transactionId)
+    {
+        DB::beginTransaction();
+
+        try {
+            $validated = $request->validated();
+
+            $transaction = Transaction::query()
+                ->with(['items', 'shipment'])
+                ->where('id', $transactionId)
+                ->firstOrFail();
+
+            if ($transaction->status !== TransactionStatus::PENDING) {
+                return ApiResponse::error(
+                    data: null,
+                    message: 'Transaction is not payable (status must be PENDING)',
+                    statusCode: Response::HTTP_CONFLICT
+                );
+            }
+
+            if ($transaction->fulfillment_type !== TransactionFulfillmentType::SHIPMENT) {
+
+                $transaction->update([
+                    'status' => TransactionStatus::PAID,
+                    'shipping_cost' => 0,
+                    'total' => $transaction->subtotal,
+                ]);
+
+                DB::commit();
+
+                $transaction->refresh()->load(['items', 'shipment', 'pickup']);
+
+                return ApiResponse::success(
+                    data: new TransactionResource($transaction),
+                    message: 'Transaction paid successfully'
+                );
+            }
+
+            $vehicleType = $validated['vehicleType'] ?? null;
+
+            if (!$vehicleType) {
+                return ApiResponse::error(
+                    data: null,
+                    message: 'vehicleType is required for SHIPMENT transactions',
+                    statusCode: Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+            }
+
+            $shipment = $transaction->shipment;
+
+            if (!$shipment) {
+                return ApiResponse::error(
+                    data: null,
+                    message: 'Shipment data not found for this transaction',
+                    statusCode: Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+            }
+
+            $transaction->update(['status' => TransactionStatus::PAID]);
+
+            $shipment->grab_vehicle_type = $vehicleType;
+            $shipment->grab_service_type = config('services.grab.default_service_type');
+
+            $grabToken = GrabApiToken::getValidAccessToken();
+
+            if (!$grabToken) {
+                DB::rollBack();
+
+                return ApiResponse::error(
+                    data: null,
+                    message: 'Grab access token not available',
+                    statusCode: Response::HTTP_SERVICE_UNAVAILABLE
+                );
+            }
+
+            $oxyAccessToken = OxyApiToken::getAccessToken();
+
+            $quotePayload = GrabDeliveryPayloadBuilder::build(
+                transaction: $transaction,
+                oxyAccessToken: $oxyAccessToken,
+                vehicleType: $vehicleType
+            );
+
+            $deliveryPayload = GrabDeliveryPayloadBuilder::withDeliveryDetails(
+                quotePayload: $quotePayload,
+                transaction: $transaction,
+                oxyAccessToken: $oxyAccessToken
+            );
+
+            $payloadErrors = GrabDeliveryPayloadValidator::validate($deliveryPayload);
+
+            if (!empty($payloadErrors)) {
+                DB::rollBack();
+
+                return ApiResponse::error(
+                    data: $payloadErrors,
+                    message: $payloadErrors[0] ?? 'Invalid Grab delivery payload',
+                    statusCode: Response::HTTP_UNPROCESSABLE_ENTITY
+                );
+            }
+
+            $createRes = GrabDeliveryService::createDelivery($grabToken, $deliveryPayload);
+
+            if (!($createRes['success'] ?? false)) {
+                DB::rollBack();
+
+                return ApiResponse::error(
+                    data: $createRes['error'] ?? null,
+                    message: $createRes['message'] ?? 'Grab create delivery failed',
+                    statusCode: $createRes['code'] ?? Response::HTTP_BAD_GATEWAY
+                )->header('X-Error-Source', 'grab');
+            }
+
+            $shippingCost = $createRes['data']['quote']['amount'] ?? 0;
+
+            $shipment->grab_delivery_id = $createRes['data']['deliveryID'] ?? null;
+            $shipment->grab_shipping_cost = $shippingCost;
+            $shipment->status = TransactionShipmentStatus::PENDING;
+            $shipment->grab_json_response = json_encode($createRes['data']);
+            $shipment->save();
+
+            $transaction->update([
+                'shipping_cost' => $shippingCost,
+                'total' => $transaction->subtotal + $shippingCost,
+            ]);
+
+            DB::commit();
+
+            $transaction->refresh()->load(['items', 'shipment', 'pickup']);
+
+            return ApiResponse::success(
+                data: new TransactionResource($transaction),
+                message: 'Transaction paid successfully'
+            );
+        } catch (ModelNotFoundException $e) {
+            DB::rollBack();
+
+            return ApiResponse::error([
+                'detail' => 'Transaction not found',
+            ], 404);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            return ApiResponse::error([
+                'detail' => $e->getMessage(),
+            ], 'Failed to pay transaction');
         }
     }
 }

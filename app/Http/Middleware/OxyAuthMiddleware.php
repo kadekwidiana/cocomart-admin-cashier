@@ -31,7 +31,7 @@ class OxyAuthMiddleware
 
         $oxyCustomerId = env('OXY_CUSTOMER_ID');
 
-        $url = $baseUrl . '/membership/api/point/total/' . $oxyCustomerId;
+        $url = $baseUrl . '/membership/api/loyalty/point/total/' . $oxyCustomerId;
 
         try {
             $response = Http::withHeaders([
