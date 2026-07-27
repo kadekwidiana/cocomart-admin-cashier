@@ -43,7 +43,7 @@ class ShipmentController extends Controller
                 );
             }
 
-            if (!$transaction->shipment) {
+            if (! $transaction->shipment) {
                 return ApiResponse::error(
                     data: null,
                     message: 'Shipment data not found for this transaction',
@@ -51,9 +51,17 @@ class ShipmentController extends Controller
                 );
             }
 
+            if ($transaction->payment_token) {
+                return ApiResponse::error(
+                    data: null,
+                    message: 'Metode pembayaran sudah dipilih, ongkir tidak bisa diubah lagi',
+                    statusCode: Response::HTTP_CONFLICT
+                );
+            }
+
             $token = GrabApiToken::getValidAccessToken();
 
-            if (!$token) {
+            if (! $token) {
                 return ApiResponse::error(
                     data: null,
                     message: 'Grab access token not available',
@@ -71,13 +79,28 @@ class ShipmentController extends Controller
 
             $response = GrabDeliveryService::quote($token, $payload);
 
-            if (!($response['success'] ?? false)) {
+            if (! ($response['success'] ?? false)) {
                 return ApiResponse::error(
                     data: $response['error'] ?? null,
                     message: $response['message'] ?? 'Failed to get delivery quote',
                     statusCode: $response['code'] ?? Response::HTTP_BAD_GATEWAY
                 );
             }
+
+            $shippingCost = $response['data']['quotes'][0]['amount'] ?? 0;
+
+            DB::transaction(function () use ($transaction, $validated, $shippingCost) {
+                $transaction->shipment->update([
+                    'grab_vehicle_type' => $validated['vehicleType'],
+                    'grab_service_type' => config('services.grab.default_service_type'),
+                    'grab_shipping_cost' => $shippingCost,
+                ]);
+
+                $transaction->update([
+                    'shipping_cost' => $shippingCost,
+                    'total' => $transaction->subtotal + $shippingCost,
+                ]);
+            });
 
             return ApiResponse::success(
                 data: $response['data'],
@@ -113,7 +136,7 @@ class ShipmentController extends Controller
 
             $token = GrabApiToken::getValidAccessToken();
 
-            if (!$token) {
+            if (! $token) {
                 return ApiResponse::error(
                     data: null,
                     message: 'Grab access token not available',
@@ -123,7 +146,7 @@ class ShipmentController extends Controller
 
             $response = GrabDeliveryService::getDelivery($token, $shipment->grab_delivery_id);
 
-            if (!($response['success'] ?? false)) {
+            if (! ($response['success'] ?? false)) {
                 return ApiResponse::error(
                     data: $response['error'] ?? null,
                     message: $response['message'] ?? 'Failed to get delivery',
@@ -178,7 +201,7 @@ class ShipmentController extends Controller
 
             $token = GrabApiToken::getValidAccessToken();
 
-            if (!$token) {
+            if (! $token) {
                 return ApiResponse::error(
                     data: null,
                     message: 'Grab access token not available',
@@ -188,7 +211,7 @@ class ShipmentController extends Controller
 
             $response = GrabDeliveryService::cancelDelivery($token, $shipment->grab_delivery_id);
 
-            if (!($response['success'] ?? false)) {
+            if (! ($response['success'] ?? false)) {
                 return ApiResponse::error(
                     data: $response['error'] ?? null,
                     message: $response['message'] ?? 'Failed to cancel delivery',
@@ -295,7 +318,7 @@ class ShipmentController extends Controller
 
         $shipment = $transaction->shipment;
 
-        if (!$shipment) {
+        if (! $shipment) {
             return ApiResponse::error(
                 data: null,
                 message: 'Shipment data not found for this transaction',
@@ -303,7 +326,7 @@ class ShipmentController extends Controller
             );
         }
 
-        if (!$shipment->grab_delivery_id) {
+        if (! $shipment->grab_delivery_id) {
             return ApiResponse::error(
                 data: null,
                 message: 'Delivery belum dibuat untuk transaksi ini (transaksi belum dibayar)',
@@ -324,7 +347,7 @@ class ShipmentController extends Controller
                 ?? $request->input('deliveryId');
             $grabStatus = $request->input('status');
 
-            if (!$deliveryId || !$grabStatus) {
+            if (! $deliveryId || ! $grabStatus) {
                 return ApiResponse::error(
                     data: null,
                     message: 'Invalid webhook payload',
@@ -336,8 +359,8 @@ class ShipmentController extends Controller
                 ->where('grab_delivery_id', $deliveryId)
                 ->first();
 
-            if (!$shipment) {
-                Log::warning('[GRAB] Webhook for unknown delivery id: ' . $deliveryId);
+            if (! $shipment) {
+                Log::warning('[GRAB] Webhook for unknown delivery id: '.$deliveryId);
 
                 return ApiResponse::error(
                     data: null,
@@ -365,7 +388,7 @@ class ShipmentController extends Controller
                 message: 'Webhook processed'
             );
         } catch (\Throwable $e) {
-            Log::error('[GRAB] Webhook error: ' . $e->getMessage());
+            Log::error('[GRAB] Webhook error: '.$e->getMessage());
 
             return ApiResponse::error([
                 'detail' => $e->getMessage(),
@@ -383,16 +406,16 @@ class ShipmentController extends Controller
     private function mapGrabStatus(string $grabStatus): ?TransactionShipmentStatus
     {
         return match (strtoupper($grabStatus)) {
-            'ALLOCATING'            => TransactionShipmentStatus::PENDING,
-            'PENDING_PICKUP'        => TransactionShipmentStatus::DRIVER_ASSIGNED,
-            'PICKING_UP'            => TransactionShipmentStatus::DRIVER_ASSIGNED, // driver menuju toko
-            'PENDING_DROP_OFF'      => TransactionShipmentStatus::PICKED_UP,       // parcel sudah diambil
-            'IN_DELIVERY'           => TransactionShipmentStatus::ON_THE_WAY,      // menuju/di tempat penerima
-            'COMPLETED'             => TransactionShipmentStatus::DELIVERED,
+            'ALLOCATING' => TransactionShipmentStatus::PENDING,
+            'PENDING_PICKUP' => TransactionShipmentStatus::DRIVER_ASSIGNED,
+            'PICKING_UP' => TransactionShipmentStatus::DRIVER_ASSIGNED, // driver menuju toko
+            'PENDING_DROP_OFF' => TransactionShipmentStatus::PICKED_UP,       // parcel sudah diambil
+            'IN_DELIVERY' => TransactionShipmentStatus::ON_THE_WAY,      // menuju/di tempat penerima
+            'COMPLETED' => TransactionShipmentStatus::DELIVERED,
             'CANCELED', 'CANCELLED' => TransactionShipmentStatus::CANCELED,
             'RETURNED', 'IN_RETURN' => TransactionShipmentStatus::CANCELED,        // dikembalikan
-            'FAILED'                => TransactionShipmentStatus::FAILED,
-            default                 => null,
+            'FAILED' => TransactionShipmentStatus::FAILED,
+            default => null,
         };
     }
 }

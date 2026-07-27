@@ -6,6 +6,7 @@ use App\Enums\TransactionStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Services\External\Paylabs\PaylabsVerifier;
+use App\Services\TransactionPaymentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -20,24 +21,27 @@ class PaylabsNotificationController extends Controller
 
         if (! $timestamp || ! $signature) {
             Log::warning('Paylabs notify: missing signature headers');
+
             return response()->json(['errCode' => '1', 'errCodeDes' => 'Missing signature headers'], 400);
         }
 
         try {
-            $isValid = (new PaylabsVerifier())->verify(
+            $isValid = (new PaylabsVerifier)->verify(
                 method: 'POST',
-                endpoint: '/' . ltrim($request->path(), '/'),
+                endpoint: '/'.ltrim($request->path(), '/'),
                 body: $body,
                 timestamp: $timestamp,
                 signature: $signature,
             );
         } catch (\Throwable $e) {
             Log::error('Paylabs notify: signature verification failed', ['error' => $e->getMessage()]);
+
             return response()->json(['errCode' => '1', 'errCodeDes' => 'Signature verification error'], 500);
         }
 
         if (! $isValid) {
             Log::warning('Paylabs notify: invalid signature', ['body' => $body]);
+
             return response()->json(['errCode' => '1', 'errCodeDes' => 'Invalid signature'], 401);
         }
 
@@ -58,8 +62,8 @@ class PaylabsNotificationController extends Controller
             ]);
         }
 
-        if ($status === '02' && $transaction->status === TransactionStatus::PENDING) {
-            $transaction->update(['status' => TransactionStatus::PAID]);
+        if ($status === '02') {
+            TransactionPaymentService::markPaidAndDispatch($transaction);
             Log::info('Paylabs payment success', ['transaction_id' => $transaction->id]);
         } elseif ($status === '09') {
             $transaction->update(['status' => TransactionStatus::CANCELED]);

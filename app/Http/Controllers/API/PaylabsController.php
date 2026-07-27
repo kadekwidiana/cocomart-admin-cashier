@@ -6,10 +6,10 @@ use App\Enums\TransactionStatus;
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\Transaction\Paylabs\CancelPaymentRequest;
-use App\Http\Requests\API\Transaction\Paylabs\InquiryPaymentRequest;
 use App\Http\Requests\API\Transaction\Paylabs\StorePaymentRequest;
 use App\Models\Transaction;
 use App\Services\External\Paylabs\PaylabsClient;
+use App\Services\TransactionPaymentService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
@@ -32,14 +32,14 @@ class PaylabsController extends Controller
             }
 
             $paymentType = $validated['paymentType'];
-            $merchantTradeNo = $transaction->id . '-' . Str::upper(Str::random(5));
+            $merchantTradeNo = $transaction->id.'-'.Str::upper(Str::random(5));
             $expireSeconds = 3600;
 
             $result = $paymentType === 'QRIS'
                 ? PaylabsClient::createQris(
                     merchantTradeNo: $merchantTradeNo,
                     amount: (float) $transaction->total,
-                    productName: 'Order ' . $transaction->id,
+                    productName: 'Order '.$transaction->id,
                     notifyUrl: config('paylabs.notify_url'),
                     expire: $expireSeconds,
                 )
@@ -47,7 +47,7 @@ class PaylabsController extends Controller
                     paymentType: $paymentType,
                     merchantTradeNo: $merchantTradeNo,
                     amount: (float) $transaction->total,
-                    productName: 'Order ' . $transaction->id,
+                    productName: 'Order '.$transaction->id,
                     payer: 'Customer',
                     notifyUrl: config('paylabs.notify_url'),
                     expire: $expireSeconds,
@@ -121,8 +121,8 @@ class PaylabsController extends Controller
 
             $status = $result['data']['status'] ?? '01';
 
-            if ($status === '02' && $transaction->status === TransactionStatus::PENDING) {
-                $transaction->update(['status' => TransactionStatus::PAID]);
+            if ($status === '02') {
+                TransactionPaymentService::markPaidAndDispatch($transaction);
             }
 
             return ApiResponse::success(
