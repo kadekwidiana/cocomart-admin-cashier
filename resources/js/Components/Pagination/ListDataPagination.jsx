@@ -14,10 +14,10 @@ export default function ListDataPagination({ data, params = {} }) {
                     <Link
                         key={index}
                         href={link.url || "#"}
-                        className={`rounded p-2 text-sm ${
+                        className={`rounded p-2 text-sm border ${
                             link.active
                                 ? "bg-primary text-white"
-                                : "bg-gray-200 text-primary hover:bg-primary/20"
+                                : "bg-white text-primary hover:bg-primary/20"
                         }`}
                         preserveScroll
                         preserveState

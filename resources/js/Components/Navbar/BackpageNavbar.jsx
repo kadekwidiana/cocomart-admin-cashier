@@ -2,6 +2,7 @@ import { appName } from "@/Constants/appName";
 import { Link, usePage } from "@inertiajs/react";
 import { Dropdown, DropdownItem } from "flowbite-react";
 import React from "react";
+import { FaUserCircle } from "react-icons/fa";
 import { IoMenu } from "react-icons/io5";
 
 export default function BackpageNavbar({ handleBackpageSidebarToggle }) {
@@ -36,16 +37,12 @@ export default function BackpageNavbar({ handleBackpageSidebarToggle }) {
                     renderTrigger={() => (
                         <button
                             type="button"
-                            className=":focus:ring-gray-600 flex rounded-full bg-gray-800 text-sm focus:ring-2 focus:ring-gray-300"
+                            className="flex rounded-full bg-primary text-sm ring-2 ring-transparent transition-all hover:ring-primary/50 focus:outline-none focus:ring-2 focus:ring-primary"
                             aria-expanded="false"
                             data-dropdown-toggle="dropdown-user"
                         >
                             <span className="sr-only">Open user menu</span>
-                            <img
-                                className="h-8 w-8 rounded-full"
-                                src="https://thumbs.dreamstime.com/b/default-avatar-profile-icon-vector-social-media-user-photo-183042379.jpg"
-                                alt="user photo"
-                            />
+                            <FaUserCircle className="h-8 w-8 rounded-full text-white" />
                         </button>
                     )}
                 >

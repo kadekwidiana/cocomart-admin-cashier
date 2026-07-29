@@ -1,4 +1,4 @@
-import { usePage } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import { Sidebar } from "flowbite-react";
 import { HiOutlineChartPie } from "react-icons/hi";
 import { TfiLayoutSliderAlt } from "react-icons/tfi";
@@ -15,7 +15,7 @@ export default function BackpageSidebar({ isVisible }) {
 
     return (
         <aside
-            className={`fixed bottom-0 left-0 top-[57px] z-40 flex w-[224px] transform flex-col border-r shadow-md transition-transform ease-in-out ${
+            className={`app-sidebar fixed bottom-0 left-0 top-[57px] z-40 flex w-[224px] transform flex-col border-r shadow-md transition-transform ease-in-out ${
                 isVisible
                     ? "-translate-x-full sm:translate-x-0"
                     : "translate-x-0 sm:-translate-x-full"
@@ -88,9 +88,14 @@ const SidebarMenu = ({ href, label, icon: Icon }) => {
 
     return (
         <Sidebar.Item
+            as={Link}
             href={href}
             icon={Icon}
-            className={pathname.startsWith(href) ? "bg-gray-100" : ""}
+            className={`
+        transition-colors duration-200 text-gray-800 [&>svg]:text-gray-800
+        hover:bg-primary/80
+        ${pathname.startsWith(href) ? "bg-primary/80" : ""}
+    `}
         >
             {label}
         </Sidebar.Item>

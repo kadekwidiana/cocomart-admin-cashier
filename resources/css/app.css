@@ -1,3 +1,17 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+[class*="dark:bg-gray-"]:not(input):not(textarea):not(select):not(thead):not(
+        thead *
+    ):not(.app-sidebar):not(.app-sidebar *) {
+    background-color: #ffffff !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: theme("colors.primary") !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
